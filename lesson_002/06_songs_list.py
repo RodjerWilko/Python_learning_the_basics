@@ -24,9 +24,9 @@ violator_songs_list = [
 # Лучше заранее вычислить необходимое, а затем в print(xxx, yyy, zzz)
 
 total_time = violator_songs_list[3][1] + violator_songs_list[5][1] + violator_songs_list[8][1]
-# TODO Не нужно преобразовывать число в строку при передаче в функцию print.
-round_time_str = str(round(total_time, 2))
-print('Три  песни звучат ' + round_time_str + ' минут')
+round_time = round(total_time, 2)
+
+print('Три  песни звучат ', round_time, ' минут')
 
 # Есть словарь песен группы Depeche Mode
 violator_songs_dict = {
@@ -46,6 +46,6 @@ violator_songs_dict = {
 
 total_time2 = violator_songs_dict['Sweetest Perfection'] + violator_songs_dict['Policy of Truth']\
               + violator_songs_dict['Blue Dress']
-# TODO Не нужно преобразовывать число в строку при передаче в функцию print.
-round_time_str = str(round(total_time2, 2))
-print('А другие три песни звучат ' + round_time_str + ' минут')
+round_time2 = round(total_time2, 2)
+
+print('А другие три песни звучат ', round_time2, ' минут')
