@@ -47,4 +47,4 @@ print(r_xy <= radius)
 # False
 # False
 
-
+# зачет!
