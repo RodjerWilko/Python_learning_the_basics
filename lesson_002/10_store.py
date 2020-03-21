@@ -61,8 +61,10 @@ table_price1 = table_item1['price']
 table_price2 = table_item2['price']
 table_cost1 = table_quantity1 * table_price1
 table_cost2 = table_quantity2 * table_price2
-print('Стол -', table_quantity1, 'шт, стоимость', table_cost1, 'руб')
-print('Стол -', table_quantity2, 'шт, стоимость', table_cost2, 'руб')
+table_total_quantity = table_quantity1 + table_quantity2
+table_total_cost = table_cost1 + table_cost2
+print('Стол -', table_total_quantity, 'шт, стоимость', table_total_cost, 'руб')
+
 
 coach_code = goods['Диван']
 coach_item1 = store[coach_code][0]
@@ -73,8 +75,9 @@ coach_price1 = coach_item1['price']
 coach_price2 = coach_item2['price']
 coach_cost1 = coach_quantity1 * coach_price1
 coach_cost2 = coach_quantity2 * coach_price2
-print('Диван -', coach_quantity1, 'шт, стоимость', coach_cost1, 'руб')
-print('Диван -', coach_quantity2, 'шт, стоимость', coach_cost2, 'руб')
+coach_total_quantity = coach_quantity1 + coach_quantity2
+coach_total_cost = coach_cost1 + coach_cost2
+print('Диван -', coach_total_quantity, 'шт, стоимость', coach_total_cost, 'руб')
 
 chair_code = goods['Стул']
 chair_item1 = store[chair_code][0]
@@ -89,9 +92,11 @@ chair_price3 = chair_item3['price']
 chair_cost1 = chair_quantity1 * chair_price1
 chair_cost2 = chair_quantity2 * chair_price2
 chair_cost3 = chair_quantity3 * chair_price2
-print('Стул -', chair_quantity1, 'шт, стоимость', chair_cost1, 'руб')
-print('Стул -', chair_quantity2, 'шт, стоимость', chair_cost2, 'руб')
-print('Стул -', chair_quantity3, 'шт, стоимость', chair_cost3, 'руб')
+chair_total_quantity = chair_quantity1 + chair_quantity2 + chair_quantity3
+chair_total_price = chair_cost1 + chair_cost2 + chair_cost3
+
+print('Стул -', chair_total_quantity, 'шт, стоимость', chair_total_price, 'руб')
+
 ##########################################################################################
 # ВНИМАНИЕ! После того как __ВСЯ__ домашняя работа сделана и запушена на сервер,         #
 # нужно зайти в ЛМС (LMS - Learning Management System ) по адресу http://go.skillbox.ru  #
@@ -99,6 +104,4 @@ print('Стул -', chair_quantity3, 'шт, стоимость', chair_cost3, '�
 # Как оформить попытку сдачи смотрите видео - https://youtu.be/qVpN0L-C3LU               #
 ##########################################################################################
 
-# TODO Нужно посчитать общие количество и стоимость товаров каждого типа:
-#  столы, стулья, диваны, лампы. У вас всё к этому готово. Осатётся только сложить
-#  переменные с количеством и стоимостью товоров одного типа между собой.
+
