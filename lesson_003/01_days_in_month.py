@@ -11,4 +11,18 @@ user_input = input("Введите, пожалуйста, номер месяц�
 month = int(user_input)
 print('Вы ввели', month)
 
-# TODO здесь ваш код
+if 0 < int(user_input) <= 12:
+    if int(user_input) == 2:
+        print('28 дней')
+    elif int(user_input) < 8:
+        if int(user_input) % 2 == 1:
+            print('31 день')
+        else:
+            print('30 дней')
+    else:
+        if int(user_input) % 2 == 1:
+            print('30 дней')
+        else:
+            print('31 день')
+else:
+    print("неверный номер месяца.")
