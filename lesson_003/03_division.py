@@ -11,4 +11,9 @@
 
 a, b = 179, 37
 
-# TODO здесь ваш код
+divisible, divider = a, b
+result = 0
+while divisible > divider:
+    divisible -= divider
+    result += 1
+print('Целочисленное деление', a, 'на', b, 'дает', result)
