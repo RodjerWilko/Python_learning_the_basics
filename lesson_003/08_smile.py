@@ -11,17 +11,15 @@ import simple_draw as sd
 # Параметры функции: кордината X, координата Y, цвет.
 # Вывести 10 смайликов в произвольных точках экрана.
 
-# TODO Обратите внимание на предупреждение среды разработки о том, что внутри функции используются те же имена
-#  переменных, что и вне ее. Здесь это не критично но в других случаях может вызвать ошибки.
-def smile(x, y, color):
+def smile(_x, _y, color):
     """Функция рисуюет смайл"""
-    center_position = sd.Point(x, y)
-    center_position_left_eye = sd.Point(x - 15, y + 15)
-    center_position_right_eye = sd.Point(x + 15, y + 15)
-    first_dot_smile = sd.Point(x - 25, y - 10)
-    second_dot_smile = sd.Point(x - 5, y - 20)
-    third_dot_smile = sd.Point(x + 5, y - 20)
-    four_dot_smile = sd.Point(x + 25, y - 10)
+    center_position = sd.Point(_x, _y)
+    center_position_left_eye = sd.Point(_x - 15, _y + 15)
+    center_position_right_eye = sd.Point(_x + 15, _y + 15)
+    first_dot_smile = sd.Point(_x - 25, _y - 10)
+    second_dot_smile = sd.Point(_x - 5, _y - 20)
+    third_dot_smile = sd.Point(_x + 5, _y - 20)
+    four_dot_smile = sd.Point(_x + 25, _y - 10)
     point_list = [first_dot_smile, second_dot_smile, third_dot_smile, four_dot_smile]
     radius = 50
     radius_eye = 5
