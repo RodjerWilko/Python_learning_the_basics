@@ -10,21 +10,11 @@
 user_input = input("Введите, пожалуйста, номер месяца: ")
 month = int(user_input)
 print('Вы ввели', month)
-# TODO В этом задании лучше использовать словарь, в котором номер месяца − ключ,
-#  а количество дней в нём − значение. Это позволит уменьшить объём кода,
-#  а количество проверок до одной.
-if 0 < int(user_input) <= 12:
-    if int(user_input) == 2:
-        print('28 дней')
-    elif int(user_input) < 8:
-        if int(user_input) % 2 == 1:
-            print('31 день')
-        else:
-            print('30 дней')
-    else:
-        if int(user_input) % 2 == 1:
-            print('30 дней')
-        else:
-            print('31 день')
+
+DAYS_OF_MONTH = {'1': 31, '2': 28, '3': 31, '4': 30, '5': 31, '6': 30, '7': 31, '8': 31, '9': 30, '10': 31, '11': 30,
+                 '12': 31}
+
+if user_input in DAYS_OF_MONTH:
+    print(DAYS_OF_MONTH[user_input])
 else:
     print("неверный номер месяца.")
