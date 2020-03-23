@@ -10,7 +10,7 @@
 #   Целочисленное деление ХХХ на YYY дает ZZZ
 
 a, b = 179, 37
-
+# TODO Программа выдаёт неправильный ответ в случае, когда числа делятся нацело.
 divisible, divider = a, b
 result = 0
 while divisible > divider:

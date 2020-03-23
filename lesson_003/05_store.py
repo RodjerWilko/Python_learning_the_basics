@@ -57,6 +57,8 @@ store = {
 for name, code in goods.items():
     total_quantity = 0
     total_cost = 0
+    # TODO Можно сделать цикл по store[product_code] не создавая
+    #  дополнительных переменных.
     list_goods = store[code]
     for i in list_goods:
         quantity1 = i['quantity']
