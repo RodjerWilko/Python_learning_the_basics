@@ -14,10 +14,11 @@ for _ in range(3):
 
 
 # Написать функцию рисования пузырька, принммающую 3 (или более) параметра: точка рисования, шаг и цвет
-def bubble(point_, radius_, color_):
+def bubble(point_, radius_, color_,):
     """Функция рисует пузырь"""
-    # TODO Пузырек это три вложенных окружностей с шагом в несколько пикселей.
-    sd.circle(center_position=point_, radius=radius_, color=color_)
+    for _ in range(3):
+        radius_ += 5
+        sd.circle(center_position=point_, radius=radius_, color=color_)
 
 
 # Нарисовать 10 пузырьков в ряд
