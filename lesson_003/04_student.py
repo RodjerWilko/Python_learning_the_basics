@@ -22,3 +22,5 @@ while months > 1:
 need_money = total_expenses - total_grant
 
 print('Студенту надо попросить', round(need_money, 2), 'рублей')
+
+# зачет!
