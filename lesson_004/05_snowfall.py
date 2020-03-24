@@ -2,7 +2,6 @@
 
 import simple_draw as sd
 
-
 # На основе кода из практической части реализовать снегопад:
 # - создать списки данных для отрисовки N снежинок
 # - нарисовать падение этих N снежинок
@@ -17,15 +16,25 @@ N = 20
 # sd.random_number()
 # sd.user_want_exit()
 
-# TODO здесь ваш код
+sd.resolution = (800, 600)
+length_snow = []
+list_xy = []
+
+for _ in range(N):
+    length_snow.append(sd.random_number(10, 100))
+for _ in range(N):
+    list_xy.append([sd.random_number(0, 800), sd.random_number(600, 800)])
+
 while True:
-    sd.clear_screen()
-    pass
-    pass
-    pass
-    sd.sleep(0.1)
-    if sd.user_want_exit():
-        break
+    for i in range(N):
+        sd.start_drawing()
+        sd.snowflake(center=sd.get_point(*list_xy[i]), length=length_snow[i], color=sd.background_color)
+        list_xy[i][1] -= 10
+        sd.snowflake(center=sd.get_point(*list_xy[i]), length=length_snow[i], color=sd.COLOR_WHITE)
+        sd.finish_drawing()
+        sd.sleep(0.1)
+        if sd.user_want_exit():
+            break
 
 sd.pause()
 
@@ -44,4 +53,22 @@ sd.pause()
 #   и добавлять новую снежинку
 # Результат решения см https://youtu.be/XBx0JtxHiLg
 
+while True:
+    for n, coord in enumerate(list_xy):
+        sd.start_drawing()
+        sd.snowflake(center=sd.get_point(*coord), length=length_snow[n], color=sd.background_color)
+        coord[1] -= 10
+        coord[0] += sd.random_number(-50, 50)
+        sd.snowflake(center=sd.get_point(*coord), length=length_snow[n], color=sd.COLOR_WHITE)
+        if coord[1] < length_snow[n]:
+            list_xy.append([sd.random_number(0, 800), sd.random_number(600, 2000)])
+            length_snow.append(sd.random_number(10, 100))
+            continue
 
+
+        sd.finish_drawing()
+        sd.sleep(0.01)
+        if sd.user_want_exit():
+            break
+
+sd.pause()

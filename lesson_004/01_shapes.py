@@ -2,6 +2,7 @@
 
 import simple_draw as sd
 
+
 # Часть 1.
 # Написать функции рисования равносторонних геометрических фигур:
 # - треугольника
@@ -27,7 +28,62 @@ import simple_draw as sd
 # sd.line()
 # Результат решения см lesson_004/results/exercise_01_shapes.jpg
 
-# TODO здесь ваш код
+
+def draw_triangle(_start_point, _angle, _length):
+    for _ in range(3):
+        v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
+        v.draw()
+        _angle = _angle + 120
+        _start_point = v.end_point
+
+
+start_point = sd.get_point(100, 100)
+angle = 20
+length = 100
+draw_triangle(_start_point=start_point, _angle=angle, _length=length)
+
+
+def draw_box(_start_point, _angle, _length):
+    for _ in range(4):
+        v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
+        v.draw()
+        _angle = _angle + 90
+        _start_point = v.end_point
+
+
+start_point = sd.get_point(300, 300)
+angle = 40
+length = 100
+draw_box(_start_point=start_point, _angle=angle, _length=length)
+
+
+def draw_pentagon(_start_point, _angle, _length):
+    for _ in range(5):
+        v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
+        v.draw()
+        _angle = _angle + 72
+        _start_point = v.end_point
+
+
+start_point = sd.get_point(100, 400)
+angle = 30
+length = 100
+draw_pentagon(_start_point=start_point, _angle=angle, _length=length)
+
+
+def draw_hexagon(_start_point, _angle, _length):
+    for _ in range(6):
+        v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
+        v.draw()
+        _angle = _angle + 60
+        _start_point = v.end_point
+
+
+start_point = sd.get_point(400, 100)
+angle = 30
+length = 100
+draw_hexagon(_start_point=start_point, _angle=angle, _length=length)
+
 
 # Часть 1-бис.
 # Попробуйте прикинуть обьем работы, если нужно будет внести изменения в этот код.
