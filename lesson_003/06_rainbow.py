@@ -26,9 +26,8 @@ for i in rainbow_colors:
 center_position = sd.Point(450, 20)
 radius = 400
 
-# TODO Можно сразу назвать переменную color вместо i.
-for i in rainbow_colors:
+
+for color in rainbow_colors:
     radius += 20
-    color = i
     sd.circle(center_position=center_position, radius=radius, color=color, width=20)
 sd.pause()
