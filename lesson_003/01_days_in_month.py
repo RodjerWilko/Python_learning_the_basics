@@ -18,3 +18,5 @@ if user_input in DAYS_OF_MONTH:
     print(DAYS_OF_MONTH[user_input])
 else:
     print("неверный номер месяца.")
+
+# зачет!
