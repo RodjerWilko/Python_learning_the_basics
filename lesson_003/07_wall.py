@@ -17,3 +17,5 @@ for i in range(0, 1000, 50):
         simple_draw.rectangle(left_bottom=left_bottom, right_top=right_top, color=simple_draw.COLOR_DARK_RED, width=2)
 
 simple_draw.pause()
+
+# зачет!
