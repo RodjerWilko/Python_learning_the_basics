@@ -30,3 +30,5 @@ for color in rainbow_colors:
     radius += 20
     sd.circle(center_position=center_position, radius=radius, color=color, width=20)
 sd.pause()
+
+# зачет!
