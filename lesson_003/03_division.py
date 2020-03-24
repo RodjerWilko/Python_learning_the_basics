@@ -17,3 +17,5 @@ while divisible >= divider:
     divisible -= divider
     result += 1
 print('Целочисленное деление', a, 'на', b, 'дает', result)
+
+# зачет!
