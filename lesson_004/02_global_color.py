@@ -48,6 +48,8 @@ def draw_hexagon(_start_point, _angle, _length, _color):
         _start_point = v.end_point
 
 
+# TODO Если COLOR сделать словарём, то обрабатывать пользовательский ввод станет проще.
+#  Посмотрите пример в задании с днями месяца в 3 уроке.
 COLOR = [
     {'name_color': 'red', 'code_color': sd.COLOR_RED},
     {'name_color': 'orange', 'code_color': sd.COLOR_ORANGE},

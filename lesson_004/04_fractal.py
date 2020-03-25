@@ -54,10 +54,12 @@ draw_branches(_start_point=root_point, _angle=90, _length=100)
 # Пригодятся функции
 # sd.random_number()
 
-
+# TODO Разные функции называются одинаково. Переименуйте одну из них.
 def draw_branches(_start_point, _angle, _length):
     _delta = sd.random_number(30, 72)
     rand_length = sd.random_number(75, 90) / 100
+    # TODO При ограничении длины в 3 пикселя получается слишком много веток.
+    #  сложно дождаться завершения отрисовки. Желательно увеличить это число.
     if _length < 3:
         return
     v1 = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
