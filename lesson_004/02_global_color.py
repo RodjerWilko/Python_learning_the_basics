@@ -75,3 +75,5 @@ draw_pentagon(_start_point=sd.get_point(100, 400), _angle=30, _length=100, _colo
 draw_hexagon(_start_point=sd.get_point(400, 100), _angle=30, _length=100, _color=COLOR[input_user]['code_color'])
 
 sd.pause()
+
+# зачет!

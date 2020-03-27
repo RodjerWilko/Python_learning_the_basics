@@ -33,6 +33,9 @@ for i in range(N):
     new_snowflake()
 
 while True:
+    # TODO sd.start_drawing() и sd.finish_drawing() нужно вызывать в цикле while, до и после
+    #  рисования снежинок. После finish_drawing нужно делать паузу sd.sleep. В цикле
+    #  рисования снежинок пауза не нужна.
     for i, snowflake in snowflakes.items():
         sd.start_drawing()
         sd.snowflake(center=sd.get_point(snowflake['x'], snowflake['y']), length=snowflake['length'],
@@ -42,6 +45,8 @@ while True:
                      color=sd.COLOR_WHITE)
         sd.finish_drawing()
         sd.sleep(0.1)
+        # TODO Вынесите это условие на уровень выше, из цикла for в цикл while.
+        #  Иначе это условие не будет корректно работать.
         if sd.user_want_exit():
             break
 
@@ -61,7 +66,8 @@ sd.pause()
 # - сделать сугоб внизу экрана - если снежинка долетает до низа, оставлять её там,
 #   и добавлять новую снежинку
 # Результат решения см https://youtu.be/XBx0JtxHiLg
-
+# TODO Оставьте из двух снегопадов один. Для второго снегопада нужно также
+#  перенести start_drawing и остальные функции во внешний цикл.
 while True:
     for i, snowflake in snowflakes.items():
         sd.start_drawing()

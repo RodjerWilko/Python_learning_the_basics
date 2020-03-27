@@ -86,3 +86,5 @@ draw_func(_start_point=sd.get_point(100, 100), _angle=20, _length=100,
           _color=COLOR[input_user]['code_color'])
 
 sd.pause()
+
+# зачет!
