@@ -151,3 +151,5 @@ length = 100
 draw_hexagon(_start_point=start_point, _angle=angle, _length=length)
 
 sd.pause()
+
+# зачет!
