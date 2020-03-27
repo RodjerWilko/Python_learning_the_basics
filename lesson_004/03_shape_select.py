@@ -11,36 +11,30 @@ import simple_draw as sd
 # Результат решения см lesson_004/results/exercise_03_shape_select.jpg
 
 
-def draw_triangle(_start_point, _angle, _length, _color):
-    for _ in range(3):
-        v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length, )
+def draw_figure(_sides, _start_point, _angle, _length, _angle_k, _color):
+    _end_point = _start_point
+    for _ in range(_sides):
+        v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
         v.draw(color=_color)
-        _angle = _angle + 120
+        _angle = _angle + _angle_k
         _start_point = v.end_point
+    sd.line(start_point=_start_point, end_point=_end_point, color=_color)
+
+
+def draw_triangle(_start_point, _angle, _length, _color):
+    draw_figure(_sides=3, _start_point=_start_point, _angle=_angle, _length=_length, _angle_k=120, _color=_color)
 
 
 def draw_box(_start_point, _angle, _length, _color):
-    for _ in range(4):
-        v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
-        v.draw(color=_color)
-        _angle = _angle + 90
-        _start_point = v.end_point
+    draw_figure(_sides=4, _start_point=_start_point, _angle=_angle, _length=_length, _angle_k=90, _color=_color)
 
 
 def draw_pentagon(_start_point, _angle, _length, _color):
-    for _ in range(5):
-        v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
-        v.draw(color=_color)
-        _angle = _angle + 72
-        _start_point = v.end_point
+    draw_figure(_sides=5, _start_point=_start_point, _angle=_angle, _length=_length, _angle_k=72, _color=_color)
 
 
 def draw_hexagon(_start_point, _angle, _length, _color):
-    for _ in range(6):
-        v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
-        v.draw(color=_color)
-        _angle = _angle + 60
-        _start_point = v.end_point
+    draw_figure(_sides=6, _start_point=_start_point, _angle=_angle, _length=_length, _angle_k=60, _color=_color)
 
 
 COLOR = {

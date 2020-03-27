@@ -102,16 +102,16 @@ import simple_draw as sd
 # А теперь - сколько надо работы что бы внести изменения в код? Выгода на лицо :)
 # Поэтому среди программистов есть принцип D.R.Y. https://clck.ru/GEsA9
 # Будьте ленивыми, не используйте копи-пасту!
-# TODO Устраните разрыв. Об этом написано в задани:
-#  Не забудте в этой общей функции придумать, как устранить разрыв
-#   в начальной/конечной точках рисуемой фигуры (если он есть)
-# TODO После исправления, замените функции рисования фигур в заданиях 2 и 3.
+
+
 def draw_figure(_sides, _start_point, _angle, _length, _angle_k):
+    _end_point = _start_point
     for _ in range(_sides):
         v = sd.get_vector(start_point=_start_point, angle=_angle, length=_length)
         v.draw()
         _angle = _angle + _angle_k
         _start_point = v.end_point
+    sd.line(start_point=_start_point, end_point=_end_point)
 
 
 def draw_triangle(_start_point, _angle, _length):
