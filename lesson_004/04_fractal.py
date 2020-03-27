@@ -74,3 +74,5 @@ def draw_branches_2(_start_point, _angle, _length):
 root_point = sd.get_point(300, 30)
 draw_branches_2(_start_point=root_point, _angle=90, _length=100)
 sd.pause()
+
+# зачет!
