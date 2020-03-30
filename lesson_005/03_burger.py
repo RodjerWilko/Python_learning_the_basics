@@ -36,3 +36,5 @@ my_burger.add_mayonnaise()
 my_burger.add_cucumber()
 my_burger.add_bun()
 print('Гамбургер готов!')
+
+# зачет!

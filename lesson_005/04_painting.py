@@ -18,11 +18,12 @@
 # пример см. lesson_005/results/04_painting.jpg
 # Приправить своей фантазией по вкусу (коты? коровы? люди? трактор? что придумается)
 import simple_draw as sd
+
 import draw.house
-import draw.tree
 import draw.rainbow
 import draw.snowflake
 import draw.sun
+import draw.tree
 
 sd.resolution = (1400, 750)
 
@@ -51,3 +52,4 @@ draw.snowflake.snowflakes(0, 400, 0, 30)
 
 
 sd.pause()
+# TODO Исправьте импорты в модуле house.
