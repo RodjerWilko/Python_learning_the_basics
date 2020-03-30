@@ -21,7 +21,9 @@ def add_to_list(_list):
     for man in _list:
         all_mans.append(man)
 
-
+# TODO Можно получить список жителей простым суммированием
+#  импортируемых списков.
+#  Это будет проще и бестрее, чем добавлять в список по одному элементу.
 add_to_list(district.central_street.house1.room1.folks)
 add_to_list(district.central_street.house1.room2.folks)
 add_to_list(district.central_street.house2.room1.folks)

@@ -1,7 +1,11 @@
-import wall
+# TODO Используйте полный путь к модулям, относительно основного
+#  модуля программы. Добавьте перед draw перед модулями из пакета draw.
+# TODO Постарайтесь не смешивать импорты своих модулей с импортами библиотек.
 import simple_draw as sd
+
 import smile
 import triangle
+import wall
 
 
 def draw_house():
