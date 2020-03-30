@@ -52,4 +52,4 @@ draw.snowflake.snowflakes(0, 400, 0, 30)
 
 
 sd.pause()
-# TODO Исправьте импорты в модуле house.
+
