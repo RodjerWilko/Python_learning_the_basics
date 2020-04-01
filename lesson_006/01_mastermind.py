@@ -48,7 +48,7 @@ import mastermind_engine as me
 me.make_number()
 while True:
     user_input = input("Введите 4х значное число: ")
-    if len(user_input) != 4:
+    if len(set(user_input)) != 4:
         print('Вы ввели некорректное число')
         continue
     bulls_cows = me.check_number(user_input)
@@ -61,6 +61,3 @@ while True:
             continue
         else:
             break
-
-# TODO Вы разрешаете пользователю вводить повторяющиеся цифры.
-#  Это даёт возможность найти четырёхзначное число перебором за 10-12 ходов.
