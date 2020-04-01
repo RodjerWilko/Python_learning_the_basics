@@ -28,10 +28,8 @@ def check_number(user_input):
     for num_user in list_user_input:
         if num_user == numbers[list_user_input.index(num_user)]:
             result_dict['bulls'] += 1
-        # TODO Объедините else и if в один elif.
-        else:
-            if num_user in numbers:
-                result_dict['cows'] += 1
+        elif num_user in numbers:
+            result_dict['cows'] += 1
     counter_step += 1
 
     return result_dict
