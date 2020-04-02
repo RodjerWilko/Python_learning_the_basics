@@ -35,6 +35,10 @@ def numbers_down():
 
 
 def del_snowflakes(my_list):
-    sorted(my_list, reverse=True)
-    for i in range(0, len(my_list)):
+    # sorted не меняет объект, сортировки.
+    #  Так что нужно сделать цикл по sorted(my_list, ...)
+    #  Либо с помощью среза получить элементы в обратном порядке.
+    #  После enumerate смисок уже отсортирован, только не в
+    #  том порядке, в котором нам нужно.
+    for i in my_list[::-1]:
         del snowflakes[i]
