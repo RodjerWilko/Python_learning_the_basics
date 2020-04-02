@@ -33,7 +33,7 @@ class Cat:
     def __init__(self):
         self.fullness = 50
         self.house = None
-        self.name = 'Кот'
+        self.name = 'кот'
 
     def __str__(self):
         return 'Я - {}, сытость {}'.format(
@@ -58,7 +58,7 @@ class Cat:
             cprint('{} умер...'.format(self.name), color='red')
             return
         dice = randint(1, 6)
-        if self.fullness < 20:
+        if self.fullness < 20 and self.house.cat_food > 10:
             self.eat()
         elif self.house.cat_food < 10:
             self.tear_wallpaper()
@@ -166,35 +166,30 @@ class House:
             self.food, self.cat_food, self.money, self.mud)
 
 
-my_sweet_home = House()
-cat = Cat()
-man = Man('Vasya')
-man.go_to_the_house(my_sweet_home)
-man.pickup_cat(cat)
-
-for day in range(1, 366):
-    print('================ день {} =================='.format(day))
-    man.act()
-    cat.act()
-    print('--- в конце дня ---')
-    print(man)
-    print(cat)
-    print(my_sweet_home)
-
 # Усложненное задание (делать по желанию)
 # Создать несколько (2-3) котов и подселить их в дом к человеку.
 # Им всем вместе так же надо прожить 365 дней.
 
 # (Можно определить критическое количество котов, которое может прокормить человек...)
-# my_sweet_home = House()
-# for citisen in citizens:
-#     citisen.go_to_the_house(house=my_sweet_home)
-#
-# for day in range(1, 366):
-#     print('================ день {} =================='.format(day))
-#     for citisen in citizens:
-#         citisen.act()
-#     print('--- в конце дня ---')
-#     for citisen in citizens:
-#         print(citisen)
-#     print(my_sweet_home)
+
+my_sweet_home = House()
+man = Man('Вася')
+cats = []
+for i in range(0, 4):
+    cats.append(Cat())
+
+man.go_to_the_house(my_sweet_home)
+for cat in cats:
+    man.pickup_cat(cat)
+
+for day in range(1, 366):
+    print('================ день {} =================='.format(day))
+    man.act()
+    for cat in cats:
+        cat.act()
+
+    print('--- в конце дня ---')
+    print(man)
+    for cat in cats:
+        print(cat)
+    print(my_sweet_home)
