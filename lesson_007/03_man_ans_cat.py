@@ -83,10 +83,10 @@ class Man:
         self.house.mud -= 100
         self.fullness += 20
 
-    def pickup_cat(self, cat):
-        cprint('{} подобрал кота, по имени {}'.format(self.name, cat.name), color='magenta')
+    def pickup_cat(self, _cat):
+        cprint('{} подобрал кота, по имени {}'.format(self.name, _cat.name), color='magenta')
 
-        cat.house = self.house
+        _cat.house = self.house
 
     def buy_cat_food(self):
         if self.house.cat_food <= 10:
@@ -110,7 +110,7 @@ class Man:
         self.house.money += 150
         self.fullness -= 10
 
-    def watch_MTV(self):
+    def watch_mtv(self):
         cprint('{} смотрел MTV целый день'.format(self.name), color='green')
         self.fullness -= 10
 
@@ -147,7 +147,7 @@ class Man:
         elif dice == 2:
             self.eat()
         else:
-            self.watch_MTV()
+            self.watch_mtv()
 
 
 class House:
@@ -159,8 +159,8 @@ class House:
         self.mud = 0
 
     def __str__(self):
-        return 'В доме еды для человека осталось {}, еды для кота осталось {} денег осталось {}, грязи в доме {}'.format(
-            self.food, self.cat_food, self.money, self.mud)
+        return 'В доме еды для человека осталось {}, еды для кота осталось {} денег осталось {},' \
+               ' грязи в доме {}'.format(self.food, self.cat_food, self.money, self.mud)
 
 
 # Усложненное задание (делать по желанию)
@@ -190,9 +190,3 @@ for day in range(1, 366):
     for cat in cats:
         print(cat)
     print(my_sweet_home)
-
-# TODO Обращайте внимание на предупреждения среды разработки о
-#  проблемах в коде или нарушении стандарта PEP 8.
-#  Попробуйте найти зеленую галочку справа над полосой прокрутки.
-#  Если вместо нее, квадрат красного, желтого или серого цвета,
-#  значит в файле есть недостатки оформления или ошибки.
