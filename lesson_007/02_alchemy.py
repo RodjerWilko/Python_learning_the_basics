@@ -196,3 +196,5 @@ class Emptiness:
 
 print(Emptiness(), '+', Air(), '=', Emptiness() + Air())
 print(Emptiness(), '+', Earth(), '=', Emptiness() + Earth())
+
+# зачет!
