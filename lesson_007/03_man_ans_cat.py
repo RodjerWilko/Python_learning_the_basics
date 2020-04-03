@@ -190,3 +190,5 @@ for day in range(1, 366):
     for cat in cats:
         print(cat)
     print(my_sweet_home)
+
+# зачет!
