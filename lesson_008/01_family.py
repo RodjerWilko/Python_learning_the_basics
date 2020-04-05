@@ -84,6 +84,9 @@ class Husband(Human):
     def __init__(self, name, house):
         super().__init__(name=name, house=house)
 
+    def __str__(self):
+        return super().__str__()
+
     def act(self):
         if self.house.filth > 90:
             self.happiness -= 10
@@ -123,6 +126,9 @@ class Wife(Human):
 
     def __init__(self, name, house):
         super().__init__(name=name, house=house)
+
+    def __str__(self):
+        return super().__str__()
 
     def act(self):
         if self.house.filth > 90:
@@ -183,7 +189,6 @@ for day in range(365):
     cprint(home, color='cyan')
 
 
-# TODO После исправления замечаний переходите ко второй части задания.
 # ####################################################### Часть вторая
 #
 # После подтверждения учителем первой части надо
@@ -238,25 +243,34 @@ class Cat:
 # отличия от взрослых - кушает максимум 10 единиц еды,
 # степень счастья  - не меняется, всегда ==100 ;)
 
-class Child:
+class Child(Human):
 
-    def __init__(self):
-        pass
+    def __init__(self, name, house):
+        super().__init__(name=name, house=house)
+        self.happiness = 100
 
     def __str__(self):
         return super().__str__()
 
     def act(self):
-        pass
+        if self.fullness < 0:
+            cprint('{} умер от голода'.format(self.name), color='red')
+            return
+        if self.fullness < 20:
+            self.eat()
+        else:
+            self.sleep()
 
     def eat(self):
-        pass
+        if self.house.food <= 0:
+            cprint('В доме кончилась еда', color='red')
+        else:
+            self.house.food -= 10
+            cprint('{} поел'.format(self.name), color='green')
 
     def sleep(self):
-        pass
-
-
-# TODO после реализации второй части - отдать на проверку учителем две ветки
+        self.fullness -= 10
+        cprint('{} поспал'.format(self.name), color='green')
 
 
 ######################################################## Часть третья
