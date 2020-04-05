@@ -60,25 +60,29 @@ class House:
 
 class Human:
 
-    def __init__(self, name):
+    def __init__(self, name, house):
         self.name = name
         self.fullness = 30
         self.happiness = 100
+        self.house = house
+
+    def __str__(self):
+        return 'Я - {}, сытость : {}, счастье : {}'.format(self.name, self.fullness,
+                                                           self.happiness)
+
+    def eat(self):
+        if self.house.food <= 0:
+            cprint('В доме кончилась еда', color='red')
+        else:
+            self.fullness += 30
+            self.house.food -= 30
+            cprint('{} поел'.format(self.name), color='green')
 
 
 class Husband(Human):
 
-    # TODO Дом есть у мужчины и у женщины и, вероятно, будет у ребёнка.
-    #  Переменную дома можно перенести в родительский __init__, а у мужа и
-    #  жены его убрать.
     def __init__(self, name, house):
-        super().__init__(name=name)
-        self.house = house
-
-    # TODO Метод __str__ совпадает у мужа и жены. Перенесите его в родительский класс.
-    def __str__(self):
-        return 'Я - {}, сытость : {}, счастье : {}'.format(self.name, self.fullness,
-                                                           self.happiness)
+        super().__init__(name=name, house=house)
 
     def act(self):
         if self.house.filth > 90:
@@ -102,13 +106,7 @@ class Husband(Human):
             self.work()
 
     def eat(self):
-        if self.house.food <= 0:
-            cprint('В доме кончилась еда', color='red')
-
-        else:
-            self.fullness += 30
-            self.house.food -= 30
-            cprint('{} поел'.format(self.name), color='green')
+        super().eat()
 
     def work(self):
         self.fullness -= 10
@@ -124,12 +122,7 @@ class Husband(Human):
 class Wife(Human):
 
     def __init__(self, name, house):
-        super().__init__(name=name)
-        self.house = house
-
-    def __str__(self):
-        return 'Я - {}, сытость : {}, счастье : {}'.format(self.name, self.fullness,
-                                                           self.happiness)
+        super().__init__(name=name, house=house)
 
     def act(self):
         if self.house.filth > 90:
@@ -150,13 +143,7 @@ class Wife(Human):
             self.buy_fur_coat()
 
     def eat(self):
-        if self.house.food <= 0:
-            cprint('В доме кончилась еда', color='red')
-
-        else:
-            self.fullness += 30
-            self.house.food -= 30
-            cprint('{} поела'.format(self.name), color='green')
+        super().eat()
 
     def shopping(self):
         if self.house.money < 30:
@@ -194,6 +181,7 @@ for day in range(365):
     cprint(serge, color='cyan')
     cprint(masha, color='cyan')
     cprint(home, color='cyan')
+
 
 # TODO После исправления замечаний переходите ко второй части задания.
 # ####################################################### Часть вторая
