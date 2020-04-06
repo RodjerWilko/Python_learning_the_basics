@@ -89,11 +89,6 @@ class Human:
 
 class Husband(Human):
 
-    # TODO Вы не меняете поведение родительского метода __init__
-    #  не нужно его переопределять.
-    def __init__(self, name, house):
-        super().__init__(name=name, house=house)
-
     def act(self):
         if self.house.filth > 90:
             self.happiness -= 10
@@ -116,10 +111,6 @@ class Husband(Human):
             self.pet_cat()
         else:
             self.work()
-
-    # TODO Вы не меняете поведение родительского метода.
-    def pet_cat(self):
-        super().pet_cat()
 
     def work(self):
         self.fullness -= 10
@@ -156,11 +147,6 @@ class Wife(Human):
             self.pet_cat()
         else:
             self.buy_fur_coat()
-
-    # TODO Вы не меняете поведение родительского метода pet_cat
-    #  не нужно его переопределять.
-    def pet_cat(self):
-        super().pet_cat()
 
     def shopping(self):
         if self.house.money < 30:
