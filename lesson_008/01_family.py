@@ -56,8 +56,9 @@ class House:
         self.filth += 5
 
     def __str__(self):
-        return 'В доме : денег : {}, еды : {}, еда кота : {}, грязи : {}'.format(self.money, self.food, self.cat_food,
-                                                                                 self.filth)
+        return 'В доме : денег : {}, еды : {}, еда кота : {}, грязи : {}'.format(
+            self.money, self.food, self.cat_food, self.filth
+        )
 
 
 class Human:
@@ -69,8 +70,9 @@ class Human:
         self.house = house
 
     def __str__(self):
-        return 'Я - {}, сытость : {}, счастье : {}'.format(self.name, self.fullness,
-                                                           self.happiness)
+        return 'Я - {}, сытость : {}, счастье : {}'.format(
+            self.name, self.fullness, self.happiness
+        )
 
     def eat(self):
         if self.house.food <= 0:
@@ -87,6 +89,8 @@ class Human:
 
 class Husband(Human):
 
+    # TODO Вы не меняете поведение родительского метода __init__
+    #  не нужно его переопределять.
     def __init__(self, name, house):
         super().__init__(name=name, house=house)
 
@@ -113,6 +117,7 @@ class Husband(Human):
         else:
             self.work()
 
+    # TODO Вы не меняете поведение родительского метода.
     def pet_cat(self):
         super().pet_cat()
 
@@ -152,6 +157,8 @@ class Wife(Human):
         else:
             self.buy_fur_coat()
 
+    # TODO Вы не меняете поведение родительского метода pet_cat
+    #  не нужно его переопределять.
     def pet_cat(self):
         super().pet_cat()
 
