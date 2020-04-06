@@ -108,11 +108,6 @@ class Husband(Human):
         else:
             self.work()
 
-    # TODO Вы не меняете поведение родительского метода,
-    #  не нужно его переопределять.
-    def eat(self):
-        super().eat()
-
     def work(self):
         self.fullness -= 10
         self.house.money += 150
@@ -125,16 +120,6 @@ class Husband(Human):
 
 
 class Wife(Human):
-
-    # TODO Вы не меняете поведение родительского метода __init__
-    #  не нужно его переопределять.
-    def __init__(self, name, house):
-        super().__init__(name=name, house=house)
-
-    # TODO Вы не меняете поведение родительского метода __str__
-    #  не нужно его переопределять.
-    def __str__(self):
-        return super().__str__()
 
     def act(self):
         if self.house.filth > 90:
@@ -153,11 +138,6 @@ class Wife(Human):
             self.clean_house()
         else:
             self.buy_fur_coat()
-
-    # TODO Вы не меняете поведение родительского метода,
-    #  не нужно его переопределять.
-    def eat(self):
-        super().eat()
 
     def shopping(self):
         if self.house.money < 30:
@@ -256,11 +236,6 @@ class Child(Human):
     def __init__(self, name, house):
         super().__init__(name=name, house=house)
         self.happiness = 100
-
-    # TODO Вы не меняете поведение родительского метода,
-    #  не нужно его переопределять.
-    def __str__(self):
-        return super().__str__()
 
     def act(self):
         if self.fullness < 0:
