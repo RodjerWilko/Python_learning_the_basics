@@ -311,6 +311,10 @@ class Child(Human):
 
 class Simulation:
 
+    # TODO Можно улучшить работу с инцидентами, если в _money_incidents и _food_incidents
+    #  передавать их количество. Для получения списка дней в году с инцедентами удобно
+    #  использовать random.sample. Убрать проверки можно, если для переменных инцедентов
+    #  сделать значения по умолчанию.
     def __init__(self, _money_incidents, _food_incidents):
         if _money_incidents != 0:
             self.money_incidents_day = 364 / _money_incidents
