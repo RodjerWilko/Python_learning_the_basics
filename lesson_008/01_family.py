@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from random import randint
+from random import sample
 
 from termcolor import cprint
 
@@ -57,11 +58,11 @@ class House:
 
     def money_incidents(self):
         self.money -= self.money / 2
-        cprint('Дома пропало половина денег', color='red')
+        # cprint('Дома пропало половина денег', color='red')
 
     def food_incidents(self):
         self.food -= self.food / 2
-        cprint('Дома пропало половина еды', color='red')
+        # cprint('Дома пропало половина еды', color='red')
 
     def __str__(self):
         return 'В доме - денег : {}, еды : {}, еда кота : {}, грязи : {}'.format(
@@ -311,19 +312,10 @@ class Child(Human):
 
 class Simulation:
 
-    # TODO Можно улучшить работу с инцидентами, если в _money_incidents и _food_incidents
-    #  передавать их количество. Для получения списка дней в году с инцедентами удобно
-    #  использовать random.sample. Убрать проверки можно, если для переменных инцедентов
-    #  сделать значения по умолчанию.
     def __init__(self, _money_incidents, _food_incidents):
-        if _money_incidents != 0:
-            self.money_incidents_day = 364 / _money_incidents
-        else:
-            self.money_incidents_day = 365
-        if _food_incidents != 0:
-            self.food_incidents_day = 364 / _food_incidents
-        else:
-            self.food_incidents_day = 365
+        list_days = list(range(1, 365))
+        self.money_incidents_day = sample(list_days, _money_incidents)
+        self.food_incidents_day = sample(list_days, _food_incidents)
 
     def experiment(self, _salary):
 
@@ -338,9 +330,9 @@ class Simulation:
             cats.append(new_cat)
 
         for day in range(365):
-            if day % self.money_incidents_day == 0:
+            if day in self.money_incidents_day:
                 home.money_incidents()
-            if day % self.food_incidents_day == 0:
+            if day in self.food_incidents_day:
                 home.food_incidents()
             # cprint('================== День {} =================='.format(day), color='red')
             home.act()
@@ -355,18 +347,15 @@ class Simulation:
             # for cat in cats:
             #     cprint(cat, color='cyan')
             # cprint(home, color='cyan')
-
         live_cats = 0
-
         for cat in cats:
             if not cat.cat_dead:
                 live_cats += 1
-
         return live_cats
 
 
-for food_incidents in range(1):
-    for money_incidents in range(1):
+for food_incidents in range(3):
+    for money_incidents in range(3):
         life = Simulation(money_incidents, food_incidents)
         for salary in range(50, 401, 50):
             max_cats = life.experiment(salary)
