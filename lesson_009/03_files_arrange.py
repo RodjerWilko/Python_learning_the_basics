@@ -34,7 +34,37 @@ import os, time, shutil
 # Чтение документации/гугла по функциям - приветствуется. Как и поиск альтернативных вариантов :)
 # Требования к коду: он должен быть готовым к расширению функциональности. Делать сразу на классах.
 
-# TODO здесь ваш код
+
+PATH = 'icons'
+DESTINATION_PATH = 'icons_by_year'
+
+
+class CopyByDate:
+
+    def __init__(self, path, destination_path):
+        self.path = path
+        self.destination_path = destination_path
+
+    def copy_files(self):
+        count = 0
+        count_copy = 0
+        os.makedirs(self.destination_path, exist_ok=True)
+        for dirpath, dirnames, filenames in os.walk(self.path):
+            count += len(filenames)
+            for file in filenames:
+                full_file_path = os.path.join(dirpath, file)
+                secs = os.path.getmtime(full_file_path)
+                file_time = time.gmtime(secs)
+                os.makedirs(os.path.join(self.destination_path, str(file_time[0]), str(file_time[1])), exist_ok=True)
+                full_file_destination = os.path.join(self.destination_path, str(file_time[0]), str(file_time[1]), file)
+                shutil.copy2(full_file_path, full_file_destination)
+                count_copy += 1
+        if count == count_copy:
+            print('Копирование прошло успешно!')
+
+
+copy = CopyByDate(PATH, DESTINATION_PATH)
+copy.copy_files()
 
 # Усложненное задание (делать по желанию)
 # Нужно обрабатывать zip-файл, содержащий фотографии, без предварительного извлечения файлов в папку.
