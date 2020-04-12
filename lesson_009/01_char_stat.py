@@ -86,11 +86,24 @@ char_stat.print_stat()
 #   см https://goo.gl/Vz4828
 #   и пример https://gitlab.skillbox.ru/vadim_shandrinov/python_base_snippets/snippets/4
 
+# TODO Отлично получилось. Вы сделали то что нужно.
+#  Можно сделать ещё один шаг для унификации кода и сокращении
+#  дублирования. Функции sort_dict у всех классов очень похожи и отличаются только
+#  индексом в ламбда функции (0 или 1) и направлением сортировки reverse=True|False.
+#  Можно сделать для этих настроек сортировки две переменные класса. Тогда
+#  sort_dict, в котором эти переменные будут использоваться останеться только в родительском
+#  классе. А в классах наследниках нужно будет только менять эти переменные:
+#  StatAscending(StatDescending):
+#      sort_order = False
+#      sort_key = 1
+
 class StatAscending(StatDescending):
     """Упорядочивание по частоте - по возрастанию"""
 
     def sort_dict(self):
         chars_list = list(self.get_stat_dict().items())
+        # TODO вместо lambda в качестве ключа сортировки можно
+        #  использовать operator.itemgetter
         chars_list.sort(key=lambda i: i[1], reverse=False)
         return chars_list
 
@@ -113,6 +126,8 @@ class StatAlphaDescending(StatDescending):
         return chars_list
 
 
+# TODO Лучше использовать библиотеку os.path или pathlib для формирования
+#  корректных путей к файлам.
 char_stat2 = StatAscending(file_name='python_snippets\\voyna-i-mir.txt.zip')
 char_stat2.print_stat()
 
