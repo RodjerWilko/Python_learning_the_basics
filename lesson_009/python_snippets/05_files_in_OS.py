@@ -46,9 +46,9 @@ print(path_normalized)
 
 count = 0
 for dirpath, dirnames, filenames in os.walk(path_normalized):
-    print('*' * 27)
-    print(dirpath, dirnames, filenames)
-    print(os.path.dirname(dirpath))
+    # print('*' * 27)
+    # print(dirpath, dirnames, filenames)
+    # print(os.path.dirname(dirpath))
     count += len(filenames)
     for file in filenames:
         full_file_path = os.path.join(dirpath, file)
