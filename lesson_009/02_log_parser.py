@@ -33,133 +33,71 @@ class LogParserByMinute:
 
     def get_log_dict(self):
         my_log_list = []
+        my_log_dict = []
         with open(file=self.file_in, mode='r') as file:
             for line in file:
-                my_log_list.append(line.split('-'))
-
-        my_log_dict = []
+                if line.split(' ')[2].replace('\n', '') == 'NOK':
+                    my_log_list.append(line.replace('\n', ''))
 
         for day in my_log_list:
-            my_dict = {'year': day[0].lstrip('['), 'month': day[1], 'day': day[2].split(' ')[0],
-                       'hour': day[2].split(' ')[1].split(':')[0], 'minute': day[2].split(' ')[1].split(':')[1],
-                       'second': day[2].split(' ')[1].split(':')[2].rstrip(']'),
-                       'status': day[2].split(' ')[2].rstrip('\n'),
-                       'count': 0}
+            my_dict = {
+                'day': day,
+                'count': 0
+            }
+
             my_log_dict.append(my_dict)
+
         return my_log_dict
 
     def get_stat_list(self):
         log_sum = []
-
         for day in self.get_log_dict():
-            if day['status'] == 'NOK':
-                # TODO Вы немного переусложинили условия обработки строк.
-                #  Можно не разделять дату на дни, месяцы, ...
-                #  Достаточно сделать срез строки на нужном сндексе.
-                #  Для года из строки нужно вырезать символы с 2 по 5,
-                #  чтобы получилась строка 2018, для месяца нужно вырезать 2018-05 и т. д.
-                if log_sum:
-                    for i, day2 in enumerate(log_sum):
-                        if day['year'] == day2['year']:
-                            if day['month'] == day2['month']:
-                                if day['day'] == day2['day']:
-                                    if day['hour'] == day2['hour']:
-                                        if day['minute'] == day2['minute']:
-                                            day2['count'] += 1
-                                        else:
-                                            if i == (len(log_sum) - 1):
-                                                log_sum.append(day)
-                                            else:
-                                                continue
-                                    else:
-                                        if i == (len(log_sum) - 1):
-                                            log_sum.append(day)
-                                        else:
-                                            continue
-                                else:
-                                    if i == (len(log_sum) - 1):
-                                        log_sum.append(day)
-                                    else:
-                                        continue
-                            else:
-                                if i == (len(log_sum) - 1):
-                                    log_sum.append(day)
-                                else:
-                                    continue
-                        else:
-                            if i == (len(log_sum) - 1):
-                                log_sum.append(day)
-                            else:
-                                continue
-                else:
-                    log_sum.append(day)
+            if log_sum:
+                for i, day2 in enumerate(log_sum):
+                    if day['day'][1:17] == day2['day'][1:17]:
+                        day2['count'] += 1
+                    else:
+                        if i == (len(log_sum) - 1):
+                            log_sum.append(day)
             else:
-                continue
+                day['count'] = 1
+                log_sum.append(day)
+
         return log_sum
 
     def write_out(self):
-
         with open(self.file_out, 'w') as file_out:
             for x in self.get_stat_list():
-                file_out.write(f'[{x["year"]}-{x["month"]}-{x["day"]} {x["hour"]}:{x["minute"]}] {x["count"]}\n')
+                file_out.write(f'{x["day"][0:17]}] {x["count"]}\n')
 
 
 parser = LogParserByMinute(FILE_IN, FILE_OUT)
 parser.write_out()
 
 
-# После выполнения первого этапа нужно сделать группировку событий
-#  - по часам
-#  - по месяцу
-#  - по году
-# Для этого пригодится шаблон проектирование "Шаблонный метод" см https://goo.gl/Vz4828
-
 class LogParserByHours(LogParserByMinute):
     """Подсчитывает число событий за час"""
 
     def get_stat_list(self):
         log_sum = []
-
         for day in self.get_log_dict():
-            if day['status'] == 'NOK':
-                if log_sum:
-                    for i, day2 in enumerate(log_sum):
-                        if day['year'] == day2['year']:
-                            if day['month'] == day2['month']:
-                                if day['day'] == day2['day']:
-                                    if day['hour'] == day2['hour']:
-                                        day2['count'] += 1
-                                    else:
-                                        if i == (len(log_sum) - 1):
-                                            log_sum.append(day)
-                                        else:
-                                            continue
-                                else:
-                                    if i == (len(log_sum) - 1):
-                                        log_sum.append(day)
-                                    else:
-                                        continue
-                            else:
-                                if i == (len(log_sum) - 1):
-                                    log_sum.append(day)
-                                else:
-                                    continue
-                        else:
-                            if i == (len(log_sum) - 1):
-                                log_sum.append(day)
-                            else:
-                                continue
-                else:
-                    log_sum.append(day)
+            if log_sum:
+                for i, day2 in enumerate(log_sum):
+                    if day['day'][1:14] == day2['day'][1:14]:
+                        day2['count'] += 1
+                    else:
+                        if i == (len(log_sum) - 1):
+                            log_sum.append(day)
             else:
-                continue
+                day['count'] = 1
+                log_sum.append(day)
+
         return log_sum
 
     def write_out(self):
-
         with open(self.file_out, 'w') as file_out:
             for x in self.get_stat_list():
-                file_out.write(f'[{x["year"]}-{x["month"]}-{x["day"]} {x["hour"]}:00] {x["count"]}\n')
+                file_out.write(f'{x["day"][0:14]}:00] {x["count"]}\n')
 
 
 class LogParserByMonth(LogParserByMinute):
@@ -167,35 +105,24 @@ class LogParserByMonth(LogParserByMinute):
 
     def get_stat_list(self):
         log_sum = []
-
         for day in self.get_log_dict():
-            if day['status'] == 'NOK':
-                if log_sum:
-                    for i, day2 in enumerate(log_sum):
-                        if day['year'] == day2['year']:
-                            if day['month'] == day2['month']:
-                                day2['count'] += 1
-                            else:
-                                if i == (len(log_sum) - 1):
-                                    log_sum.append(day)
-                                else:
-                                    continue
-                        else:
-                            if i == (len(log_sum) - 1):
-                                log_sum.append(day)
-                            else:
-                                continue
-                else:
-                    log_sum.append(day)
+            if log_sum:
+                for i, day2 in enumerate(log_sum):
+                    if day['day'][1:8] == day2['day'][1:8]:
+                        day2['count'] += 1
+                    else:
+                        if i == (len(log_sum) - 1):
+                            log_sum.append(day)
             else:
-                continue
+                day['count'] = 1
+                log_sum.append(day)
+
         return log_sum
 
     def write_out(self):
-
         with open(self.file_out, 'w') as file_out:
             for x in self.get_stat_list():
-                file_out.write(f'[{x["year"]}-{x["month"]}] {x["count"]}\n')
+                file_out.write(f'{x["day"][0:8]}] {x["count"]}\n')
 
 
 class LogParserByYear(LogParserByMinute):
@@ -203,29 +130,24 @@ class LogParserByYear(LogParserByMinute):
 
     def get_stat_list(self):
         log_sum = []
-
         for day in self.get_log_dict():
-            if day['status'] == 'NOK':
-                if log_sum:
-                    for i, day2 in enumerate(log_sum):
-                        if day['year'] == day2['year']:
-                            day2['count'] += 1
-                        else:
-                            if i == (len(log_sum) - 1):
-                                log_sum.append(day)
-                            else:
-                                continue
-                else:
-                    log_sum.append(day)
+            if log_sum:
+                for i, day2 in enumerate(log_sum):
+                    if day['day'][1:5] == day2['day'][1:5]:
+                        day2['count'] += 1
+                    else:
+                        if i == (len(log_sum) - 1):
+                            log_sum.append(day)
             else:
-                continue
+                day['count'] = 1
+                log_sum.append(day)
+
         return log_sum
 
     def write_out(self):
-
         with open(self.file_out, 'w') as file_out:
             for x in self.get_stat_list():
-                file_out.write(f'[{x["year"]}] {x["count"]}\n')
+                file_out.write(f'{x["day"][0:5]}] {x["count"]}\n')
 
 
 parser = LogParserByHours(FILE_IN, FILE_OUT)
