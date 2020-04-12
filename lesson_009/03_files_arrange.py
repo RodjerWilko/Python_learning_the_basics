@@ -36,7 +36,6 @@ import time
 # Чтение документации/гугла по функциям - приветствуется. Как и поиск альтернативных вариантов :)
 # Требования к коду: он должен быть готовым к расширению функциональности. Делать сразу на классах.
 
-
 PATH = 'icons'
 DESTINATION_PATH = 'icons_by_year'
 
@@ -50,19 +49,22 @@ class CopyByDate:
     def copy_files(self):
         count = 0
         count_copy = 0
-        os.makedirs(self.destination_path, exist_ok=True)
-        for dirpath, dirnames, filenames in os.walk(self.path):
-            count += len(filenames)
-            for file in filenames:
-                full_file_path = os.path.join(dirpath, file)
-                secs = os.path.getmtime(full_file_path)
-                file_time = time.gmtime(secs)
-                os.makedirs(os.path.join(self.destination_path, str(file_time[0]), str(file_time[1])), exist_ok=True)
-                full_file_destination = os.path.join(self.destination_path, str(file_time[0]), str(file_time[1]), file)
-                shutil.copy2(full_file_path, full_file_destination)
-                count_copy += 1
-        if count == count_copy:
-            print('Копирование прошло успешно!')
+        if os.path.exists(self.path):
+            os.makedirs(self.destination_path, exist_ok=True)
+            for dirpath, dirnames, filenames in os.walk(self.path):
+                count += len(filenames)
+                for file in filenames:
+                    full_file_path = os.path.join(dirpath, file)
+                    secs = os.path.getmtime(full_file_path)
+                    file_time = time.gmtime(secs)
+                    os.makedirs(os.path.join(self.destination_path, str(file_time[0]), str(file_time[1])), exist_ok=True)
+                    full_file_destination = os.path.join(self.destination_path, str(file_time[0]), str(file_time[1]), file)
+                    shutil.copy2(full_file_path, full_file_destination)
+                    count_copy += 1
+            if count == count_copy:
+                print('Копирование прошло успешно!')
+        else:
+            print(f'"{self.path}" - Такого пути не существует')
 
 
 copy = CopyByDate(PATH, DESTINATION_PATH)
@@ -75,5 +77,3 @@ copy.copy_files()
 # Документация по zipfile: API https://docs.python.org/3/library/zipfile.html
 # Для этого пригодится шаблон проектирование "Шаблонный метод" см https://goo.gl/Vz4828
 
-# TODO Добавьте проверку на наличие источника файлов. Сейчас при отсутствии каталога
-#  icons программа сообщает, что копирование завершилось успешно.
