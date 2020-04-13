@@ -20,6 +20,7 @@
 #
 # Упорядочивание по частоте - по убыванию. Ширину таблицы подберите по своему вкусу
 # Требования к коду: он должен быть готовым к расширению функциональности. Делать сразу на классах.
+import collections
 import operator
 import os
 import zipfile
@@ -45,23 +46,12 @@ class StatDescending:
     def get_stat_dict(self):
         if self.file_name.endswith('.zip'):
             self.unzip()
-        chars = {}
+        chars = collections.defaultdict(int)
         with open(self.file_name, 'r') as file:
             for line in file:
                 for char in line:
                     if char.isalpha():
-                        # TODO Пропустил при прошлой проверке. Следующие строки можно
-                        #  немного оптимизировать.
-                        #  Подобная конструкций со словарём может
-                        #  быть значительно упрощена, если заменить словарь на
-                        #  defaultdict или Counter из библиотеки collections.
-                        #  Нужно будет chars = {} заменить на collections.defaultdict(int),
-                        #  а из следующих 4 строк оставить одну с +=.  Похожим способом можно
-                        #  применить collections.Counter.
-                        if char in chars:
-                            chars[char] += 1
-                        else:
-                            chars[char] = 1
+                        chars[char] += 1
         return chars
 
     def sort_dict(self):
