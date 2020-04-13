@@ -50,6 +50,14 @@ class StatDescending:
             for line in file:
                 for char in line:
                     if char.isalpha():
+                        # TODO Пропустил при прошлой проверке. Следующие строки можно
+                        #  немного оптимизировать.
+                        #  Подобная конструкций со словарём может
+                        #  быть значительно упрощена, если заменить словарь на
+                        #  defaultdict или Counter из библиотеки collections.
+                        #  Нужно будет chars = {} заменить на collections.defaultdict(int),
+                        #  а из следующих 4 строк оставить одну с +=.  Похожим способом можно
+                        #  применить collections.Counter.
                         if char in chars:
                             chars[char] += 1
                         else:
