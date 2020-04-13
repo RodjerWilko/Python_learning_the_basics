@@ -105,3 +105,5 @@ parser = LogParserByMonth(FILE_IN, FILE_OUT)
 parser.write_out()
 parser = LogParserByYear(FILE_IN, FILE_OUT)
 parser.write_out()
+
+# зачет!
