@@ -27,6 +27,9 @@ FILE_OUT = 'out.txt'
 class LogParserByMinute:
     """Подсчитывает число событий за минуту"""
 
+    start_index = 1
+    end_index = 17
+
     def __init__(self, file_in, file_out):
         self.file_in = file_in
         self.file_out = file_out
@@ -54,7 +57,7 @@ class LogParserByMinute:
         for day in self.get_log_dict():
             if log_sum:
                 for i, day2 in enumerate(log_sum):
-                    if day['day'][1:17] == day2['day'][1:17]:
+                    if day['day'][self.start_index:self.end_index] == day2['day'][self.start_index:self.end_index]:
                         day2['count'] += 1
                     else:
                         if i == (len(log_sum) - 1):
@@ -68,7 +71,7 @@ class LogParserByMinute:
     def write_out(self):
         with open(self.file_out, 'w') as file_out:
             for x in self.get_stat_list():
-                file_out.write(f'{x["day"][0:17]}] {x["count"]}\n')
+                file_out.write(f'{x["day"][0:self.end_index]}] {x["count"]}\n')
 
 
 parser = LogParserByMinute(FILE_IN, FILE_OUT)
@@ -78,76 +81,22 @@ parser.write_out()
 class LogParserByHours(LogParserByMinute):
     """Подсчитывает число событий за час"""
 
-    def get_stat_list(self):
-        log_sum = []
-        for day in self.get_log_dict():
-            if log_sum:
-                for i, day2 in enumerate(log_sum):
-                    if day['day'][1:14] == day2['day'][1:14]:
-                        day2['count'] += 1
-                    else:
-                        if i == (len(log_sum) - 1):
-                            log_sum.append(day)
-            else:
-                day['count'] = 1
-                log_sum.append(day)
-
-        return log_sum
-
-    def write_out(self):
-        with open(self.file_out, 'w') as file_out:
-            for x in self.get_stat_list():
-                file_out.write(f'{x["day"][0:14]}:00] {x["count"]}\n')
+    start_index = 1
+    end_index = 14
 
 
 class LogParserByMonth(LogParserByMinute):
     """Подсчитывает число событий за месяц"""
 
-    def get_stat_list(self):
-        log_sum = []
-        for day in self.get_log_dict():
-            if log_sum:
-                for i, day2 in enumerate(log_sum):
-                    if day['day'][1:8] == day2['day'][1:8]:
-                        day2['count'] += 1
-                    else:
-                        if i == (len(log_sum) - 1):
-                            log_sum.append(day)
-            else:
-                day['count'] = 1
-                log_sum.append(day)
-
-        return log_sum
-
-    def write_out(self):
-        with open(self.file_out, 'w') as file_out:
-            for x in self.get_stat_list():
-                file_out.write(f'{x["day"][0:8]}] {x["count"]}\n')
+    start_index = 1
+    end_index = 8
 
 
 class LogParserByYear(LogParserByMinute):
     """Подсчитывает число событий за год"""
 
-    def get_stat_list(self):
-        log_sum = []
-        for day in self.get_log_dict():
-            if log_sum:
-                for i, day2 in enumerate(log_sum):
-                    if day['day'][1:5] == day2['day'][1:5]:
-                        day2['count'] += 1
-                    else:
-                        if i == (len(log_sum) - 1):
-                            log_sum.append(day)
-            else:
-                day['count'] = 1
-                log_sum.append(day)
-
-        return log_sum
-
-    def write_out(self):
-        with open(self.file_out, 'w') as file_out:
-            for x in self.get_stat_list():
-                file_out.write(f'{x["day"][0:5]}] {x["count"]}\n')
+    start_index = 1
+    end_index = 5
 
 
 parser = LogParserByHours(FILE_IN, FILE_OUT)
@@ -156,12 +105,3 @@ parser = LogParserByMonth(FILE_IN, FILE_OUT)
 parser.write_out()
 parser = LogParserByYear(FILE_IN, FILE_OUT)
 parser.write_out()
-
-# TODO Код стал гораздо проще и понятнее. Осталось доработать задание по примеру первого.
-#  методы write_out и get_stat_list отличаются только индексами в срезах строк.
-#  Значения индексов лучше вынести в переменные класса. А сами методы не переопределять.
-#  То, что в двух заданиях удалось так упростить методы сортировки и вывода результатов,
-#  подобрано специально для иллюстрации того как можно делать. Так получается не всегда,
-#  обычно всё-таки при расширении классов для новых задач приходится переопределять
-#  часть методов. Но видеть повторяющиеся части кода и сделать небольшой рефакторинг
-#  это полезный навык.
