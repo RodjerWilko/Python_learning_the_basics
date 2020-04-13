@@ -116,3 +116,5 @@ char_stat3.print_stat()
 
 char_stat4 = StatAlphaDescending(file_name=os.path.normpath('python_snippets\\voyna-i-mir.txt.zip'))
 char_stat4.print_stat()
+
+# зачет!
