@@ -3,11 +3,19 @@
 # Умножить константу BRUCE_WILLIS на пятый элемент строки, введенный пользователем
 
 BRUCE_WILLIS = 42
+try:
+    input_data = input('Если хочешь что-нибудь сделать, сделай это сам: ')
+    leeloo = int(input_data[4])
+    result = BRUCE_WILLIS * leeloo
+except ValueError:
+    print('Введены не цифры')
+except IndexError:
+    print('Количество введенных цифр меньше 5')
+except Exception:
+    print('Не понятно что, но что-то пошло не так')
+else:
+    print(f"- Leeloo Dallas! Multi-pass № {result}!")
 
-input_data = input('Если хочешь что-нибудь сделать, сделай это сам: ')
-leeloo = int(input_data[4])
-result = BRUCE_WILLIS * leeloo
-print(f"- Leeloo Dallas! Multi-pass № {result}!")
 
 # Ообернуть код и обработать исключительные ситуации для произвольных входных параметров
 # - ValueError - невозможно преобразовать к числу
