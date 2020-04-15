@@ -69,3 +69,5 @@ with open(file='registrations_good.log', mode='a', encoding='utf8') as log_g, op
             print('Проверка файла прошла успешно!')
     else:
         print(f'Такого пути : {PATH} - не сущестует')
+
+# зачет!

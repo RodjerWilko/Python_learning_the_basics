@@ -88,3 +88,5 @@ while True:
                 f.write(f'{str(exc)}\r')
 
 # https://goo.gl/JnsDqu
+
+# зачет!
