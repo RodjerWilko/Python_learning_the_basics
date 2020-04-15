@@ -51,6 +51,10 @@ total_strokes = 0
 total_good_log = 0
 total_bad_log = 0
 
+# TODO Каждый раз открывать файл на запись довольно ресурсозатратно.
+#  Будет правильнее открыть все файлы до цикла.
+#  Вы можете открыть сразу несколько файлов в одном контест менеджере.
+#  with open('file1', 'w') as file1, open('file2', 'w') as file2:
 if os.path.exists(PATH):
     with open(file='registrations.txt', mode='r', encoding='utf-8')as ff:
         for line in ff:
