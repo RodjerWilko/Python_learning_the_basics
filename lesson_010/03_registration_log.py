@@ -51,25 +51,21 @@ total_strokes = 0
 total_good_log = 0
 total_bad_log = 0
 
-# TODO Каждый раз открывать файл на запись довольно ресурсозатратно.
-#  Будет правильнее открыть все файлы до цикла.
-#  Вы можете открыть сразу несколько файлов в одном контест менеджере.
-#  with open('file1', 'w') as file1, open('file2', 'w') as file2:
-if os.path.exists(PATH):
-    with open(file='registrations.txt', mode='r', encoding='utf-8')as ff:
-        for line in ff:
-            total_strokes += 1
-            try:
-                if check_valid(line):
-                    with open(file='registrations_good.log', mode='a', encoding='utf8') as log_g:
+with open(file='registrations_good.log', mode='a', encoding='utf8') as log_g, open(file='registrations_bad.log',
+                                                                                   mode='a', encoding='utf8') as log_b:
+    if os.path.exists(PATH):
+        with open(file='registrations.txt', mode='r', encoding='utf-8')as ff:
+            for line in ff:
+                total_strokes += 1
+                try:
+                    if check_valid(line):
                         log_g.write(line)
                         total_good_log += 1
-            except Exception as exc:
-                with open(file='registrations_bad.log', mode='a', encoding='utf8') as log_b:
+                except Exception as exc:
                     log_b.write(f'{line[:-1]} - {exc}\n')
                     total_bad_log += 1
 
-    if (total_good_log + total_bad_log) == total_strokes:
-        print('Проверка файла прошла успешно!')
-else:
-    print(f'Такого пути : {PATH} - не сущестует')
+        if (total_good_log + total_bad_log) == total_strokes:
+            print('Проверка файла прошла успешно!')
+    else:
+        print(f'Такого пути : {PATH} - не сущестует')
