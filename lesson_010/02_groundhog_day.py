@@ -21,36 +21,37 @@ import random
 ENLIGHTENMENT_CARMA_LEVEL = 777
 
 
-# TODO Здесь лучше сделать базовый класс исключения,
-#  от которого унаследовать остальные и в except
-#  перехватывать базовое исключение, а не Exception
-class IamGodError(Exception):
+class MyBaseException(Exception):
+    pass
+
+
+class IamGodError(MyBaseException):
 
     def __str__(self):
         return 'IamGodError'
 
 
-class DrunkError(Exception):
+class DrunkError(MyBaseException):
     def __str__(self):
         return 'DrunkError'
 
 
-class CarCrashError(Exception):
+class CarCrashError(MyBaseException):
     def __str__(self):
         return 'CarCrashError'
 
 
-class GluttonyError(Exception):
+class GluttonyError(MyBaseException):
     def __str__(self):
         return 'GluttonyError'
 
 
-class DepressionError(Exception):
+class DepressionError(MyBaseException):
     def __str__(self):
         return 'DepressionError'
 
 
-class SuicideError(Exception):
+class SuicideError(MyBaseException):
     def __str__(self):
         return 'SuicideError'
 
@@ -81,10 +82,9 @@ while True:
             carma = one_day()
             total_days += 1
             total_carma += carma
-        except Exception as exc:
+        except MyBaseException as exc:
             print(f'Вылетело исключение {exc}')
             with open(file='error_log.txt', mode='a') as f:
                 f.write(f'{str(exc)}\r')
-
 
 # https://goo.gl/JnsDqu
