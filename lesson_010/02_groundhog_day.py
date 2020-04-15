@@ -21,6 +21,9 @@ import random
 ENLIGHTENMENT_CARMA_LEVEL = 777
 
 
+# TODO Здесь лучше сделать базовый класс исключения,
+#  от которого унаследовать остальные и в except
+#  перехватывать базовое исключение, а не Exception
 class IamGodError(Exception):
 
     def __str__(self):
