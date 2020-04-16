@@ -2,6 +2,7 @@
 
 import simple_draw as sd
 
+
 # На основе вашего кода из решения lesson_004/01_shapes.py сделать функцию-фабрику,
 # которая возвращает функции рисования треугольника, четырехугольника, пятиугольника и т.д.
 #
@@ -14,12 +15,19 @@ import simple_draw as sd
 
 
 def get_polygon(n):
-    pass
-    # TODO здесь ваш код
+    def draw_figure(point, angle, length):
+        _end_point = point
+        for _ in range(n):
+            v = sd.get_vector(start_point=point, angle=angle, length=length)
+            v.draw()
+            angle = angle + (360 / n)
+            point = v.end_point
+        sd.line(start_point=point, end_point=_end_point)
+
+    return draw_figure
 
 
 draw_triangle = get_polygon(n=3)
 draw_triangle(point=sd.get_point(200, 200), angle=13, length=100)
-
 
 sd.pause()
