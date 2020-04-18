@@ -20,13 +20,15 @@ def log_errors(func):  # ОБЫЧНЫЙ ДЕКОРАТОР
                 ff.write(
                     f'имя функции:<{func.__name__}> параметры вызова: <{param} >'
                     f' тип ошибки:  <{e}> текст ошибки :<{e.args}\n>')
-
+        # TODO return лучше делать в секции try.
         return result(param)
 
     return surrogate
 
 
 def log_errors_file(file):  # УСЛОЖНЕННЫЙ ДЕКОРАТОР
+    # TODO Имя log_errors используется для первой версии декоратора.
+    #  Функцию лучше переименовать.
     def log_errors(func):
         def surrogate(param):
             try:
@@ -36,7 +38,7 @@ def log_errors_file(file):  # УСЛОЖНЕННЫЙ ДЕКОРАТОР
                     ff.write(
                         f'имя функции:<{func.__name__}> параметры вызова: <{param} >'
                         f' тип ошибки:  <{e}> текст ошибки :<{e.args}\n>')
-
+            # TODO Перенесите return  в секуию try.
             return result(param)
 
         return surrogate
