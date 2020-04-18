@@ -15,35 +15,31 @@ def log_errors(func):  # ОБЫЧНЫЙ ДЕКОРАТОР
     def surrogate(param):
         try:
             result = func(param)
+            return result(param)
         except Exception as e:
             with open(file=PATH_OUT, mode='a', encoding='UTF-8') as ff:
                 ff.write(
                     f'имя функции:<{func.__name__}> параметры вызова: <{param} >'
                     f' тип ошибки:  <{e}> текст ошибки :<{e.args}\n>')
-        # TODO return лучше делать в секции try.
-        return result(param)
 
     return surrogate
 
 
 def log_errors_file(file):  # УСЛОЖНЕННЫЙ ДЕКОРАТОР
-    # TODO Имя log_errors используется для первой версии декоратора.
-    #  Функцию лучше переименовать.
-    def log_errors(func):
+    def log_errors2(func):
         def surrogate(param):
             try:
                 result = func(param)
+                return result(param)
             except Exception as e:
                 with open(file=os.path.normpath(file), mode='a', encoding='UTF-8') as ff:
                     ff.write(
                         f'имя функции:<{func.__name__}> параметры вызова: <{param} >'
                         f' тип ошибки:  <{e}> текст ошибки :<{e.args}\n>')
-            # TODO Перенесите return  в секуию try.
-            return result(param)
 
         return surrogate
 
-    return log_errors
+    return log_errors2
 
 
 @log_errors_file('function_errors.log')
