@@ -18,49 +18,38 @@ import os
 PATH = os.path.normpath('events.txt')
 
 
-def pars_gen():
-    my_log_list = []
-    my_log_dict = []
+def pars_gen(mode):
+    """Статистика по минутам параметр - "minute", по часам - "hour",
+     по дням - "day", по месяцам - "month", по годам - "year" """
+
+    mode_dict = {
+        'minute': [1, 17],
+        'hour': [1, 14],
+        'day': [1, 10],
+        'month': [1, 8],
+        'year': [1, 5]
+    }
+
+    start_n = mode_dict[mode][0]
+    end_n = mode_dict[mode][1]
+
+    data = None
+    count = 1
     with open(file=PATH, mode='r') as file:
         for line in file:
             if line.split(' ')[2].replace('\n', '') == 'NOK':
-                my_log_list.append(line.replace('\n', ''))
-    for day in my_log_list:
-        my_dict = {
-            'day': day,
-            'count': 0
-        }
-        my_log_dict.append(my_dict)
-
-    log_sum = []
-    for day in my_log_dict:
-        if log_sum:
-            for i, day2 in enumerate(log_sum):
-                # TODO Нужно предусмотреть настройку для задания разных
-                #  интервалов группировки событий: минута, час, ...
-                if day['day'][1:17] == day2['day'][1:17]:
-                    day2['count'] += 1
+                if data:
+                    if line[start_n:end_n] == data:
+                        count += 1
+                    else:
+                        yield data, count
+                        data = line[start_n:end_n]
+                        count = 1
                 else:
-                    if i == (len(log_sum) - 1):
-                        log_sum.append(day)
-        else:
-            day['count'] = 1
-            log_sum.append(day)
-
-    for x in log_sum:
-        yield x.values()
-
-# TODO События в файле отсортированы по возрастанию даты и времени.
-#  Поэтому нет необходимости предварительно обработать данные, и только после этого
-#  возвращать. Такой подход не оптимален из-за необходимости хранить все данные.
-#  Нужно переделать код таким образом, чтобы возвращать (yield) результат сразу после
-#  его получения. Т. е. хранить нужно только строку с текущим периодом времени.
-#  При обработке строки проверять что период совпадает и тогда нужно только увеличить
-#  счётчик. Если не совпадает, то возвращаете период и накопленное количество событий.
-#  И заменяете старый период на новый. После завершения цикла по строкам файлов
-#  Заключительным yield возвращаете последний накопленный результат.
+                    data = line[start_n:end_n]
+        yield data, count
 
 
-grouped_events = pars_gen()
+grouped_events = pars_gen(mode='minute')
 for group_time, event_count in grouped_events:
-    print(f'[{group_time[1:17]}] {event_count}')
+    print(f'[{group_time}] {event_count}')
