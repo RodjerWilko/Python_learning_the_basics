@@ -50,16 +50,11 @@
 #     print(number)
 
 
-# TODO Переходите ко второй части.
-#  В этом задании я предлагаю некоторым студентам нобязательную бонусную
-#  часть задания. Подумайте каким образом можно оптимизировать генерацию
-#  простых чисел.
-#
-
 #  после подтверждения части 1 преподователем, можно делать
 # Часть 2
 # Теперь нужно создать генератор, который выдает последовательность простых чисел до n
 # Распечатать все простые числа до 10000 в столбик
+from math import sqrt
 
 
 def prime_numbers_generator(n):
@@ -79,8 +74,54 @@ def prime_numbers_generator(n):
             yield number_
 
 
-for number in prime_numbers_generator(n=10000):
-    print(number)
+def happy_numbers(numbers):
+    """Возвращает True, если переданное число - счастливое"""
+    list_numbers = []
+    numbers = str(numbers)
+    middle = len(numbers) // 2
+    if len(numbers) < 2:
+        return False
+    else:
+        for dig in numbers:
+            list_numbers.append(int(dig))
+        if len(list_numbers) % 2 == 0:
+            return True if sum(list_numbers[:middle]) == sum(list_numbers[middle:]) else False
+        else:
+            return True if sum(list_numbers[:middle]) == sum(list_numbers[middle + 1:]) else False
+
+
+def palindrom(numbers):
+    """Возвращает True, если переданное число - палиндром"""
+    numbers = str(numbers)
+    if len(numbers) > 1:
+        middle = len(numbers) // 2
+        if len(numbers) % 2 == 0:
+            return True if numbers[:middle] == numbers[:middle - 1:-1] else False
+        else:
+            return True if numbers[:middle] == numbers[:middle:-1] else False
+
+
+def square(numbers):
+    """Возвращает True, если переданное число - квадратное, являющееся квадратом некоторого целого числа"""
+
+    return True if sqrt(numbers).is_integer() else False
+
+
+happy_nums = list(filter(happy_numbers, prime_numbers_generator(10000)))  # список простых чисел и счастивых
+for number in happy_nums:
+    print(f'{number} - простое и счастливое число')
+
+palindrom_nums = list(filter(palindrom, prime_numbers_generator(10000)))  # список простых чисел и палиндромов
+for number in palindrom_nums:
+    print(f'{number} - палиндром и простое число')
+
+happy_pal = filter(palindrom, happy_nums)  # список простых, счастливых палиндромов
+for number in happy_pal:
+    print(f'{number} - палиндром, счастливое и простое число')
+
+square_nums = list(filter(square, prime_numbers_generator(10000)))
+for number in happy_pal:
+    print(f'{number} - квадратное число')
 
 # Часть 3
 # Написать несколько функций-фильтров, которые выдает True, если число:
