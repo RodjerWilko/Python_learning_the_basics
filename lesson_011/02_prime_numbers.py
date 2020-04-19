@@ -21,33 +21,35 @@
 #
 # Распечатать все простые числа до 10000 в столбик
 
+#
+# class PrimeNumbers:
+#     def __init__(self, n):
+#         self.prime_numbers = []
+#         self.n = n
+#         self.i = 0
+#
+#     def __iter__(self):
+#         self.i = 1
+#         return self
+#
+#     def __next__(self):
+#         while self.i < self.n:
+#             self.i += 1
+#             for prime in self.prime_numbers:
+#                 if self.i % prime == 0:
+#                     break
+#             else:
+#                 self.prime_numbers.append(self.i)
+#                 return self.i
+#         else:
+#             raise StopIteration()
+#
+#
+# prime_number_iterator = PrimeNumbers(n=1000)
+# for number in prime_number_iterator:
+#     print(number)
 
-class PrimeNumbers:
-    def __init__(self, n):
-        self.prime_numbers = []
-        self.n = n
-        self.i = 0
 
-    def __iter__(self):
-        self.i = 1
-        return self
-
-    def __next__(self):
-        while self.i < self.n:
-            self.i += 1
-            for prime in self.prime_numbers:
-                if self.i % prime == 0:
-                    break
-            else:
-                self.prime_numbers.append(self.i)
-                return self.i
-        else:
-            raise StopIteration()
-
-
-prime_number_iterator = PrimeNumbers(n=1000)
-for number in prime_number_iterator:
-    print(number)
 # TODO Переходите ко второй части.
 #  В этом задании я предлагаю некоторым студентам нобязательную бонусную
 #  часть задания. Подумайте каким образом можно оптимизировать генерацию
@@ -60,13 +62,25 @@ for number in prime_number_iterator:
 # Распечатать все простые числа до 10000 в столбик
 
 
-# def prime_numbers_generator(n):
-#     pass
-#     # TODO здесь ваш код
-#
-#
-# for number in prime_numbers_generator(n=10000):
-#     print(number)
+def prime_numbers_generator(n):
+    # Оптимизируем генератор тем , что не будем проверять четные числа кроме двойки,
+    # т.к. они все делятся на 2 и все числа котрые делятся на 5 кремя пятерки
+    # соответственно он должен стать работать еще быстрее
+    yield 2
+    prime_numbers = [2]
+    for number_ in range(3, n + 1, 2):
+        if number_ > 10 and number_ % 5 == 0:
+            continue
+        for prime in prime_numbers:
+            if number_ % prime == 0:
+                break
+        else:
+            prime_numbers.append(number_)
+            yield number_
+
+
+for number in prime_numbers_generator(n=10000):
+    print(number)
 
 # Часть 3
 # Написать несколько функций-фильтров, которые выдает True, если число:
