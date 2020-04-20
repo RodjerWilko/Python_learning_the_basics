@@ -20,44 +20,43 @@
 # который выдает последовательность простых чисел до n
 #
 # Распечатать все простые числа до 10000 в столбик
+import math
 
-#
-# class PrimeNumbers:
-#     def __init__(self, n):
-#         self.prime_numbers = []
-#         self.n = n
-#         self.i = 0
-#
-#     def __iter__(self):
-#         self.i = 1
-#         return self
-#
-#     def __next__(self):
-#         while self.i < self.n:
-#             self.i += 1
-#             for prime in self.prime_numbers:
-#                 if self.i % prime == 0:
-#                     break
-#             else:
-#                 self.prime_numbers.append(self.i)
-#                 return self.i
-#         else:
-#             raise StopIteration()
-#
-#
-# TODO Раскомментируйте первую часть задания. Можно оставить комментарием
-#  следующие строки инициализации класса вывода результата..
-# prime_number_iterator = PrimeNumbers(n=1000)
-# for number in prime_number_iterator:
-#     print(number)
+
+class PrimeNumbers:
+    def __init__(self, n):
+        self.prime_numbers = []
+        self.n = n
+        self.i = 0
+
+    def __iter__(self):
+        self.i = 1
+        return self
+
+    def __next__(self):
+        while self.i < self.n:
+            self.i += 1
+            for prime in self.prime_numbers:
+                if self.i % prime == 0:
+                    break
+            else:
+                self.prime_numbers.append(self.i)
+                return self.i
+        else:
+            raise StopIteration()
+
+
+"""
+prime_number_iterator = PrimeNumbers(n=1000)
+for number in prime_number_iterator:
+    print(number)
+"""
 
 
 #  после подтверждения части 1 преподователем, можно делать
 # Часть 2
 # Теперь нужно создать генератор, который выдает последовательность простых чисел до n
 # Распечатать все простые числа до 10000 в столбик
-# TODO Все импорты должны выполняться в начале модуля.
-from math import sqrt
 
 
 def prime_numbers_generator(n):
@@ -67,38 +66,28 @@ def prime_numbers_generator(n):
     yield 2
     prime_numbers = [2]
     for number_ in range(3, n + 1, 2):
-        # TODO Идея выкидывать пятёрки интересна, но существенного прироста
-        #  производительности не даст. Лучше использовать тот факт, что для проверки числа
-        #  на простоту нужно проверять не все простые числа, которые меньше его,
-        #  а только те, что меньше квадратного корня из этого числа. В условиях задачи
-        #  можно немного упростить это условие и добавлять в prime_numbers только те
-        #  числа, которые меньше квадратного корня из n.
-        if number_ > 10 and number_ % 5 == 0:
-            continue
         for prime in prime_numbers:
             if number_ % prime == 0:
                 break
         else:
-            prime_numbers.append(number_)
-            yield number_
+            if number_ > math.sqrt(n):
+                yield number_
+            else:
+                prime_numbers.append(number_)
+                yield number_
 
 
 def happy_numbers(numbers):
     """Возвращает True, если переданное число - счастливое"""
     list_numbers = []
     numbers = str(numbers)
-    middle = len(numbers) // 2
     if len(numbers) < 2:
         return False
     else:
         for dig in numbers:
             list_numbers.append(int(dig))
-        # TODO В зависимости от условия можно вычислять только индекс середины списка.
-        #  Остальной код можно сделать одинаковым.
-        if len(list_numbers) % 2 == 0:
-            return True if sum(list_numbers[:middle]) == sum(list_numbers[middle:]) else False
-        else:
-            return True if sum(list_numbers[:middle]) == sum(list_numbers[middle + 1:]) else False
+        middle = len(list_numbers) // 2
+        return True if sum(list_numbers[:middle]) == sum(list_numbers[-1:-(middle + 1):-1]) else False
 
 
 def palindrom(numbers):
@@ -106,18 +95,13 @@ def palindrom(numbers):
     numbers = str(numbers)
     if len(numbers) > 1:
         middle = len(numbers) // 2
-        if len(numbers) % 2 == 0:
-            return True if numbers[:middle] == numbers[:middle - 1:-1] else False
-        else:
-            return True if numbers[:middle] == numbers[:middle:-1] else False
+        return True if numbers[:middle] == numbers[-1:-(middle + 1):-1] else False
 
 
-# TODO Этот фильтр не очень рационально применять к простым числам. У простого
-#  числа нет делителей и оно не может быть квадратом другого числа.
-def square(numbers):
-    """Возвращает True, если переданное число - квадратное, являющееся квадратом некоторого целого числа"""
-
-    return True if sqrt(numbers).is_integer() else False
+def auto_morph(numbers):
+    """Возвращает True, если переданное число автоморфное, т.е при возведении в квадрат заканчивается на само себя"""
+    x = numbers ** 2
+    return True if str(x).endswith(str(numbers)) else False
 
 
 happy_nums = list(filter(happy_numbers, prime_numbers_generator(10000)))  # список простых чисел и счастивых
@@ -132,9 +116,9 @@ happy_pal = filter(palindrom, happy_nums)  # список простых, сча
 for number in happy_pal:
     print(f'{number} - палиндром, счастливое и простое число')
 
-square_nums = list(filter(square, prime_numbers_generator(10000)))
-for number in happy_pal:
-    print(f'{number} - квадратное число')
+auto_morph_nums = list(filter(auto_morph, prime_numbers_generator(10000)))
+for number in auto_morph_nums:
+    print(f'{number} - автоморфное простое число')
 
 # Часть 3
 # Написать несколько функций-фильтров, которые выдает True, если число:
@@ -151,8 +135,35 @@ for number in happy_pal:
 # простых счастливых палиндромных чисел и так далее. Придумать не менее 2х способов.
 #
 # Подсказка: возможно, нужно будет добавить параметр в итератор/генератор.
-# TODO Сделайте ещё один способ фильтрации простых чисел. Нужно изменить
-#  генератор так, чтобы он принимал в аргумент список функция фильтров.
-#  Возвращаться должно только такое число, для которого все функции фильтры выдадут True.
-#  При отсутствии функций в аргументах генератор должен работать как обычно и возвращать
-#  все простые числа.
+
+
+func_list = [happy_numbers, palindrom]
+
+
+def prime_numbers_generator2(n, list_=None):
+    def funcs(num, lists=list_):
+        if lists is not None:
+            list_bool = [func(num) for func in lists]
+            return list_bool
+        else:
+            return [True]
+
+    if False not in funcs(2):
+        yield 2
+    prime_numbers = [2]
+    for number_ in range(3, n + 1, 2):
+        for prime in prime_numbers:
+            if number_ % prime == 0:
+                break
+        else:
+            if number_ > math.sqrt(n):
+                if False not in funcs(number_):
+                    yield number_
+            else:
+                prime_numbers.append(number_)
+                if False not in funcs(number_):
+                    yield number_
+
+
+for number in prime_numbers_generator2(10000, func_list):
+    print(number)
