@@ -53,3 +53,5 @@ def pars_gen(mode):
 grouped_events = pars_gen(mode='minute')
 for group_time, event_count in grouped_events:
     print(f'[{group_time}] {event_count}')
+
+# зачет!
