@@ -161,9 +161,15 @@ def prime_numbers_generator2(n, list_=None):
                     yield number_
             else:
                 prime_numbers.append(number_)
+                #  Для таких случаев в python есть встроенная функция all,
+                #  которая возвращает True, если bool(x) является True для
+                #  всех элементов переданного на вход объекта:
+                #  if all(funcs(number_)):
                 if False not in funcs(number_):
                     yield number_
 
 
 for number in prime_numbers_generator2(10000, func_list):
     print(number)
+
+# зачет!
