@@ -73,4 +73,86 @@
 #     def run(self):
 #         <обработка данных>
 
-# TODO написать код в однопоточном/однопроцессорном стиле
+
+import operator
+import os
+import time
+
+PATH = os.path.normpath('trades')
+files = []
+
+
+def time_track(func):
+    def surrogate(*args, **kwargs):
+        started_at = time.time()
+
+        result = func(*args, **kwargs)
+
+        ended_at = time.time()
+        elapsed = round(ended_at - started_at, 4)
+        print(f'Функция работала {elapsed} секунд(ы)')
+        return result
+
+    return surrogate
+
+
+class Volatility:
+
+    def __init__(self, path):
+        self.path = path
+        self.ticks_volat = {}
+
+    def run(self):
+        with open(file=self.path, mode='r')as ff:
+            tick_dict = {'name': self.path.split('_')[1][0:4], 'prices': []}
+            for line in ff:
+                content = line.split(',')
+                if content[2].isalpha():
+                    continue
+                tick_dict['prices'].append(float(content[2]))
+
+        self.ticks_volat = self.volat(tick_dict)
+
+    def volat(self, list_):
+        dict_volat = {}
+        average_price = (max(list_['prices']) + min(list_['prices'])) / 2
+        volatility = (max(list_['prices']) - min(list_['prices'])) / average_price * 100
+        dict_volat['name'] = list_['name']
+        dict_volat['volatility'] = volatility
+        return dict_volat
+
+
+@time_track
+def main():
+    tickers = {}
+    tickers_null = []
+    for dirpath, dirnames, filenames in os.walk(PATH):
+        for file in filenames:
+            full_path = os.path.join(dirpath, file)
+            files.append(full_path)
+
+    vols = [Volatility(file) for file in files]
+    for vol in vols:
+        vol.run()
+        tickers[vol.ticks_volat['name']] = vol.ticks_volat['volatility']
+
+    tickers = sorted(tickers.items(), key=operator.itemgetter(1))
+
+    for tick in tickers[::-1]:
+        if tick[1] == 0.0:
+            tickers_null.append('тикер ' + tick[0])
+            tickers.remove(tick)
+    tickers_null = sorted(tickers_null)
+
+    print('            максимальная волатильность:')
+    for tick in tickers[:-4:-1]:
+        print(f'тикер {tick[0]} - {tick[1]:.2f} %')
+    print('            миниимальная волатильность:')
+    for tick in tickers[:3]:
+        print(f'тикер {tick[0]} - {tick[1]:.2f} %')
+    print('            нулевая волатильность:')
+    print(', '.join(tickers_null))
+
+
+if __name__ == '__main__':
+    main()
