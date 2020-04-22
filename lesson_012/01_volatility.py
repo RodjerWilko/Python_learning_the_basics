@@ -77,6 +77,7 @@
 import operator
 import os
 import time
+import sys
 
 PATH = os.path.normpath('trades')
 files = []
@@ -101,27 +102,29 @@ class Volatility:
     def __init__(self, path):
         self.path = path
         self.ticks_volat = {}
+        self.max_vol = 0
+        self.min_vol = sys.maxsize
+        self.name = None
 
     def run(self):
         with open(file=self.path, mode='r')as ff:
-            # TODO Для поиска максимума и минимума не нужно сохранять всё значения.
-            #  Значений может быть очень много, и для их хранения потребуется дополнительная память.
-            #  Задайте начальные значения минимума и максимума и меняйте их, если в одной из строк
-            #  встретится значение больше или меньше заданного.
-            tick_dict = {'name': self.path.split('_')[1][0:4], 'prices': []}
+            self.name = self.path.split('_')[1][0:4]
             for line in ff:
                 content = line.split(',')
                 if content[2].isalpha():
                     continue
-                tick_dict['prices'].append(float(content[2]))
+                if float(content[2]) > self.max_vol:
+                    self.max_vol = float(content[2])
+                if float(content[2]) < self.min_vol:
+                    self.min_vol = float(content[2])
 
-        self.ticks_volat = self.volat(tick_dict)
+        self.ticks_volat = self.volat()
 
-    def volat(self, list_):
+    def volat(self):
         dict_volat = {}
-        average_price = (max(list_['prices']) + min(list_['prices'])) / 2
-        volatility = (max(list_['prices']) - min(list_['prices'])) / average_price * 100
-        dict_volat['name'] = list_['name']
+        average_price = (self.max_vol + self.min_vol) / 2
+        volatility = (self.max_vol - self.min_vol) / average_price * 100
+        dict_volat['name'] = self.name
         dict_volat['volatility'] = volatility
         return dict_volat
 
