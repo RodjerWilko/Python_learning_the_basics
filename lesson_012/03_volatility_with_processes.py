@@ -21,9 +21,9 @@
 import multiprocessing
 import operator
 import os
-import threading
-import time
 import sys
+# TODO Неиспользуемый импорт. Ниже есть лишняя строка в классе Volatility.
+import time
 
 PATH = os.path.normpath('trades')
 files = []
