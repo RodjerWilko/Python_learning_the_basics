@@ -17,6 +17,99 @@
 #       ТИКЕР7, ТИКЕР8, ТИКЕР9, ТИКЕР10, ТИКЕР11, ТИКЕР12
 # Волатильности указывать в порядке убывания. Тикеры с нулевой волатильностью упорядочить по имени.
 #
-# TODO Внимание! это задание можно выполнять только после зачета lesson_012/01_volatility.py !!!
 
-# TODO тут ваш код в многопоточном стиле
+
+import operator
+import os
+import threading
+import time
+import sys
+
+PATH = os.path.normpath('trades')
+files = []
+
+
+def time_track(func):
+    def surrogate(*args, **kwargs):
+        started_at = time.time()
+
+        result = func(*args, **kwargs)
+
+        ended_at = time.time()
+        elapsed = round(ended_at - started_at, 4)
+        print(f'Функция работала {elapsed} секунд(ы)')
+        return result
+
+    return surrogate
+
+
+class Volatility(threading.Thread):
+
+    def __init__(self, path, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.path = path
+        self.ticks_volat = {}
+        self.max_vol = 0
+        self.min_vol = sys.maxsize
+        self.name = None
+
+    def run(self):
+        with open(file=self.path, mode='r')as ff:
+            self.name = self.path.split('_')[1][0:4]
+            for line in ff:
+                content = line.split(',')
+                if content[2].isalpha():
+                    continue
+                if float(content[2]) > self.max_vol:
+                    self.max_vol = float(content[2])
+                if float(content[2]) < self.min_vol:
+                    self.min_vol = float(content[2])
+
+        self.ticks_volat = self.volat()
+
+    def volat(self):
+        dict_volat = {}
+        average_price = (self.max_vol + self.min_vol) / 2
+        volatility = (self.max_vol - self.min_vol) / average_price * 100
+        dict_volat['name'] = self.name
+        dict_volat['volatility'] = volatility
+        return dict_volat
+
+
+@time_track
+def main():
+    tickers = {}
+    tickers_null = []
+    for dirpath, dirnames, filenames in os.walk(PATH):
+        for file in filenames:
+            full_path = os.path.join(dirpath, file)
+            files.append(full_path)
+
+    vols = [Volatility(file) for file in files]
+    for vol in vols:
+        vol.start()
+
+    for vol in vols:
+        vol.join()
+        tickers[vol.ticks_volat['name']] = vol.ticks_volat['volatility']
+
+    tickers = sorted(tickers.items(), key=operator.itemgetter(1))
+
+    for tick in tickers[::-1]:
+        if tick[1] == 0.0:
+            tickers_null.append('тикер ' + tick[0])
+            tickers.remove(tick)
+    tickers_null = sorted(tickers_null)
+
+    print('            максимальная волатильность:')
+    for tick in tickers[:-4:-1]:
+        print(f'тикер {tick[0]} - {tick[1]:.2f} %')
+    print('            миниимальная волатильность:')
+    for tick in tickers[:3]:
+        print(f'тикер {tick[0]} - {tick[1]:.2f} %')
+    print('            нулевая волатильность:')
+    print(', '.join(tickers_null))
+
+
+if __name__ == '__main__':
+    main()
