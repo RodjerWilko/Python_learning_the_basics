@@ -76,8 +76,8 @@
 
 import operator
 import os
-import time
 import sys
+import time
 
 PATH = os.path.normpath('trades')
 files = []
@@ -163,3 +163,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# зачет!
