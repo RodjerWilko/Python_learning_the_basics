@@ -22,7 +22,6 @@ import multiprocessing
 import operator
 import os
 import sys
-# TODO Неиспользуемый импорт. Ниже есть лишняя строка в классе Volatility.
 import time
 
 PATH = os.path.normpath('trades')
@@ -51,23 +50,20 @@ class Volatility(multiprocessing.Process):
         self.ticks_volat = {}
         self.max_vol = 0
         self.min_vol = sys.maxsize
-        self.name = 'p'
+        self.name = ''
         self.collector = collector
 
     def run(self):
         with open(file=self.path, mode='r')as ff:
             self.name = self.path.split('_')[1][0:4]
+            ff.readline()
             for line in ff:
                 content = line.split(',')
-                if content[2].isalpha():
-                    continue
                 if float(content[2]) > self.max_vol:
                     self.max_vol = float(content[2])
                 if float(content[2]) < self.min_vol:
                     self.min_vol = float(content[2])
-
         self.collector.put(self.volat())
-
 
     def volat(self):
         dict_volat = {}
@@ -97,14 +93,13 @@ def main():
 
     while not collector.empty():
         data = collector.get()
-        tickers[data['name']] = data['volatility']
+        if data.ticks_volat['volatility'] == 0.0:
+            tickers_null.append('тикер ' + data.ticks_volat['name'])
+        else:
+            tickers[data.ticks_volat['name']] = data.ticks_volat['volatility']
 
     tickers = sorted(tickers.items(), key=operator.itemgetter(1))
 
-    for tick in tickers[::-1]:
-        if tick[1] == 0.0:
-            tickers_null.append('тикер ' + tick[0])
-            tickers.remove(tick)
     tickers_null = sorted(tickers_null)
 
     print('            максимальная волатильность:')

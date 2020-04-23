@@ -51,22 +51,14 @@ class Volatility(threading.Thread):
         self.ticks_volat = {}
         self.max_vol = 0
         self.min_vol = sys.maxsize
-        # TODO Лучше заменить None на пустую строку, чтобы убрать
-        #  предупреждение среды разработки.
-        self.name = None
+        self.name = ''
 
     def run(self):
         with open(file=self.path, mode='r')as ff:
             self.name = self.path.split('_')[1][0:4]
+            ff.readline()
             for line in ff:
                 content = line.split(',')
-                # TODO Просмотрел это условие в первом задании.
-                #  Такая ситуация, когда вместо числа в строке строка,
-                #  можнет возникнуть только для первой строки, а условие проверяется для
-                #  каждой. Это можно исправить прочитав одну строку из файла до цикла.
-                #  Исправьте это же место в остальных заданиях.
-                if content[2].isalpha():
-                    continue
                 if float(content[2]) > self.max_vol:
                     self.max_vol = float(content[2])
                 if float(content[2]) < self.min_vol:
@@ -98,17 +90,13 @@ def main():
 
     for vol in vols:
         vol.join()
-        # TODO Будет оптимальнее сразу проверять тикер на нулевую волатильность и
-        #  помещать его название в отдельный список. Словарь лучше оставить для
-        #  ненулевых тикеров.
-        tickers[vol.ticks_volat['name']] = vol.ticks_volat['volatility']
+        if vol.ticks_volat['volatility'] == 0.0:
+            tickers_null.append('тикер ' + vol.ticks_volat['name'])
+        else:
+            tickers[vol.ticks_volat['name']] = vol.ticks_volat['volatility']
 
     tickers = sorted(tickers.items(), key=operator.itemgetter(1))
 
-    for tick in tickers[::-1]:
-        if tick[1] == 0.0:
-            tickers_null.append('тикер ' + tick[0])
-            tickers.remove(tick)
     tickers_null = sorted(tickers_null)
 
     print('            максимальная волатильность:')
