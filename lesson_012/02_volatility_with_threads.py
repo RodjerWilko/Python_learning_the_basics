@@ -21,9 +21,9 @@
 
 import operator
 import os
+import sys
 import threading
 import time
-import sys
 
 PATH = os.path.normpath('trades')
 files = []
@@ -51,6 +51,8 @@ class Volatility(threading.Thread):
         self.ticks_volat = {}
         self.max_vol = 0
         self.min_vol = sys.maxsize
+        # TODO Лучше заменить None на пустую строку, чтобы убрать
+        #  предупреждение среды разработки.
         self.name = None
 
     def run(self):
@@ -58,6 +60,11 @@ class Volatility(threading.Thread):
             self.name = self.path.split('_')[1][0:4]
             for line in ff:
                 content = line.split(',')
+                # TODO Просмотрел это условие в первом задании.
+                #  Такая ситуация, когда вместо числа в строке строка,
+                #  можнет возникнуть только для первой строки, а условие проверяется для
+                #  каждой. Это можно исправить прочитав одну строку из файла до цикла.
+                #  Исправьте это же место в остальных заданиях.
                 if content[2].isalpha():
                     continue
                 if float(content[2]) > self.max_vol:
@@ -91,6 +98,9 @@ def main():
 
     for vol in vols:
         vol.join()
+        # TODO Будет оптимальнее сразу проверять тикер на нулевую волатильность и
+        #  помещать его название в отдельный список. Словарь лучше оставить для
+        #  ненулевых тикеров.
         tickers[vol.ticks_volat['name']] = vol.ticks_volat['volatility']
 
     tickers = sorted(tickers.items(), key=operator.itemgetter(1))
