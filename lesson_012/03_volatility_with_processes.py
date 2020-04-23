@@ -47,7 +47,6 @@ class Volatility(multiprocessing.Process):
     def __init__(self, path, collector, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.path = path
-        self.ticks_volat = {}
         self.max_vol = 0
         self.min_vol = sys.maxsize
         self.name = ''
@@ -93,10 +92,10 @@ def main():
 
     while not collector.empty():
         data = collector.get()
-        if data.ticks_volat['volatility'] == 0.0:
-            tickers_null.append('тикер ' + data.ticks_volat['name'])
+        if data['volatility'] == 0.0:
+            tickers_null.append('тикер ' + data['name'])
         else:
-            tickers[data.ticks_volat['name']] = data.ticks_volat['volatility']
+            tickers[data['name']] = data['volatility']
 
     tickers = sorted(tickers.items(), key=operator.itemgetter(1))
 
