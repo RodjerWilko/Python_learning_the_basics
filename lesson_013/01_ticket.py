@@ -46,6 +46,8 @@ def make_ticket(fio, from_, to, date, out_path='ticket.png'):
 # и заполнять билет.
 
 
+# TODO Следующие строки лучше поместить в функцию, и вызывать её при запуске
+#  модуля. if __name__ == "__main__":
 parser = argparse.ArgumentParser(description='Fill a ticket')
 parser.add_argument('--fio', action="store", type=str, dest="fio")
 parser.add_argument('--from', action="store", type=str, dest="from_")

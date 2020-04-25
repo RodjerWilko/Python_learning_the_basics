@@ -2,7 +2,6 @@ from random import randint
 
 import vk_api
 import vk_api.bot_longpoll
-
 from tok import t
 
 group_id = 194634835
@@ -27,6 +26,9 @@ class Bot:
     def on_event(self, event):
         if event.type == vk_api.bot_longpoll.VkBotEventType.MESSAGE_NEW:
             print(event.obj['message']['text'])
+            # TODO При отправке сообщения вы сами генерируете random_id.
+            #  В библиотеке для генерации идентификатора есть специальная
+            #  функция vk_api.utils.get_random_id.
             self.api.messages.send(
                 message=f"Мы получили сообщение от Вас : {event.obj['message']['text']}",
                 random_id=randint(0, 2 ** 20),
