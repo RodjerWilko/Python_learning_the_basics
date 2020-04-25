@@ -46,13 +46,16 @@ def make_ticket(fio, from_, to, date, out_path='ticket.png'):
 # и заполнять билет.
 
 
-# TODO Следующие строки лучше поместить в функцию, и вызывать её при запуске
-#  модуля. if __name__ == "__main__":
-parser = argparse.ArgumentParser(description='Fill a ticket')
-parser.add_argument('--fio', action="store", type=str, dest="fio")
-parser.add_argument('--from', action="store", type=str, dest="from_")
-parser.add_argument('--to', action="store", type=str, dest="to")
-parser.add_argument('--date', action="store", type=str, dest="date")
-parser.add_argument('--save_to', action="store", type=str, default='ticket.png', dest="save_to")
-args = parser.parse_args()
-make_ticket(fio=args.fio, from_=args.from_, to=args.to, date=args.date, out_path=args.save_to)
+def main():
+    parser = argparse.ArgumentParser(description='Fill a ticket')
+    parser.add_argument('--fio', action="store", type=str, dest="fio")
+    parser.add_argument('--from', action="store", type=str, dest="from_")
+    parser.add_argument('--to', action="store", type=str, dest="to")
+    parser.add_argument('--date', action="store", type=str, dest="date")
+    parser.add_argument('--save_to', action="store", type=str, default='ticket.png', dest="save_to")
+    args = parser.parse_args()
+    make_ticket(fio=args.fio, from_=args.from_, to=args.to, date=args.date, out_path=args.save_to)
+
+
+if __name__ == "__main__":
+    main()
