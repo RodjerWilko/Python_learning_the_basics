@@ -1,51 +1,84 @@
-def get_score(game_result):
-    """Подсчитывает количество очков по результатам игры"""
+class Bowling:
 
-    list_result = list(game_result)
-    total_score = 0
+    def __init__(self, game_result):
+        self.game_result = game_result
+        self.dict = {
+            'X': self.strike,
+            '/': self.spare,
+            '-': self.zero,
+        }
 
-    try:
-        for i, char in enumerate(list_result):
-            if char == 'X':
-                total_score += 20
+        self.throw_num = 1
+        self.total_score = 0
+        self.frames = 0
 
-            elif char == '-':
-                if list_result[i + 1].isdigit():
-                    total_score += int(list_result[i + 1])
-                    del list_result[i + 1]
-                elif list_result[i + 1] == '-':
-                    total_score += 0
-                    del list_result[i + 1]
-                else:
-                    total_score += 15
-                    del list_result[i + 1]
+    def strike(self):
+        """X"""
 
-            elif char.isdigit():
-                if list_result[i + 1].isdigit():
-                    total_score += int(char) + int(list_result[i + 1])
-                    del list_result[i + 1]
-                elif list_result[i + 1] == '/':
-                    total_score += 15
-                    del list_result[i + 1]
-                elif list_result[i + 1] == '-':
-                    total_score += int(char)
-                    del list_result[i + 1]
+        if self.throw_num == 1:
+            return 20
+        else:
+            raise Exception('Strike может быть только первым броском')
+
+    def spare(self):
+        """/"""
+
+        if self.throw_num == 2:
+            self.throw_num = 1
+            return 15
+        else:
+            raise Exception('Spare может быть только со второго броска')
+
+    def zero(self):
+        """-"""
+
+        if self.throw_num == 1:
+            self.throw_num = 2
+            return 0
+        else:
+            self.throw_num = 1
+            return 0
+
+    def point(self, i):
+        """digit"""
+
+        if self.throw_num == 1:
+            if i != (len(self.game_result) - 1):
+                if self.game_result[i + 1] == '/':
+                    self.throw_num = 2
+                    return 0
+                elif self.game_result[i + 1] == '-':
+                    self.throw_num = 2
+                    return self.game_result[i]
+                elif self.game_result[i + 1].isdigit:
+                    if (int(self.game_result[i]) + int(self.game_result[i + 1])) >= 10:
+                        raise Exception('Больше 10 в одном фрейме или не указан Spare')
+                    else:
+                        self.throw_num = 2
+                        return self.game_result[i]
 
             else:
-                try:
-                    raise ValueError
-                except ValueError:
-                    return 'Некорректные входящие данные'
+                raise Exception('Некорректное число бросков')
 
-    except IndexError:
-        return 'Некорректные входящие данные'
+        elif self.throw_num == 2 and i == (len(self.game_result) - 1):
+            return self.game_result[i]
 
-    return total_score
+        else:
+            self.throw_num = 1
+            return self.game_result[i]
 
-# TODO Подумайте над таким вариантом развития вашего решения:
-#  - Сделать несколько классов для каждого типа событий: страйк, спэйр, промах, цифра, ...
-#  - В основной классе сделать словарь с символами в качестве ключа
-#  и ссылкой на классы событий.
-#  - В основном классе или его методе подсчёта очков
-#  нужно сделать переменную для учёта является ли текущий символ в строке первым символом
-#  в фрэйме или вторым.
+    def get_score(self):
+        for i, char in enumerate(self.game_result):
+            if self.throw_num == 1:
+                self.frames += 1
+            if char.isdigit():
+                self.total_score += int(self.point(i))
+            else:
+                self.total_score += self.dict[char]()
+
+        print(self.total_score)
+
+        if self.frames < 10:
+            raise Exception('Сыграно меньше 10 фреймов')
+        else:
+            return self.total_score

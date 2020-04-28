@@ -33,14 +33,16 @@ import argparse
 # Из текущего файла сделать консольную утилиту для определения количества очков, с помощью пакета argparse
 # Скрипт должен принимать параметр --result и печатать на консоль:
 #   Количество очков для результатов ХХХ - УУУ.
-from bowling import get_score
+from bowling import Bowling
 
 
 def scores():
     parser = argparse.ArgumentParser()
     parser.add_argument('--result', action='store', type=str, dest='game_result')
     args = parser.parse_args()
-    print(f'Количество очков для результатов {args.game_result} - {get_score(args.game_result)}')
+    b = Bowling(args.game_result)
+
+    print(f'Количество очков для результатов {args.game_result} - {b.get_score()}')
 
 
 if __name__ == '__main__':
@@ -50,9 +52,3 @@ if __name__ == '__main__':
 # И, возможно, вам пригодится паттерн проектирования "Состояние",
 #   см https://clck.ru/Fudd8 и https://refactoring.guru/ru/design-patterns/state
 
-# TODO Неправильно подсчитывается счёт:
-#  - когда фрейм не завершен, и начинается следующий: 44-X, 4X.
-#  - количество сбитых кеглей в фрейме превышает 10: 77XX
-#  - количество сбитых кеглей в фрейме равно 10, но не указан спэйр: 55XX, 64XX
-
-# TODO В тестах нужно проверять возникновение ошибок.

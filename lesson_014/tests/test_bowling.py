@@ -1,27 +1,32 @@
 import unittest
-from bowling import get_score
+from bowling import Bowling
 
 
 class ScoreTest(unittest.TestCase):
 
     def test_only_strike(self):
-        result = get_score('XXXXXXXXXX')
+        b = Bowling('XXXXXXXXXX')
+        result = b.get_score()
         self.assertEqual(result, 200)
 
     def test_only_spare(self):
-        result = get_score('1/1/1/1/1/1/1/1/1/1/')
+        b = Bowling('1/1/1/1/1/1/1/1/1/1/')
+        result = b.get_score()
         self.assertEqual(result, 150)
 
     def test_only_digits(self):
-        result = get_score('34127316123413145254')
+        b = Bowling('34127316123413145254')
+        result = b.get_score()
         self.assertEqual(result, 62)
 
     def test_only_zero(self):
-        result = get_score('-11--55----1-2-3-4-5')
+        b = Bowling('-11--55----1-2-3-4-5')
+        result = b.get_score()
         self.assertEqual(result, 27)
 
     def test_all(self):
-        result = get_score('X-2344/4/--12X231-')
+        b = Bowling('X-2344/4/--12X231-')
+        result = b.get_score()
         self.assertEqual(result, 88)
 
 
