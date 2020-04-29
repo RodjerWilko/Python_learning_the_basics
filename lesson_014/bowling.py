@@ -82,3 +82,4 @@ class Bowling:
             raise Exception('Сыграно меньше 10 фреймов')
         else:
             return self.total_score
+# TODO В целом всё неплохо. Нужно доработать тесты.
