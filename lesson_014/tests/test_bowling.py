@@ -1,4 +1,5 @@
 import unittest
+
 from bowling import Bowling
 
 
@@ -7,6 +8,8 @@ class ScoreTest(unittest.TestCase):
     def test_wrong_throws(self):
         with self.assertRaises(Exception) as exc:
             bowling = Bowling('1')
+            # TODO Если не используете result,
+            #  не нужно создавать переменную, можно просто вызвать функцию.
             result = bowling.get_score()
         expected_msg = 'Некорректное число бросков'
         self.assertEqual(exc.exception.args[0], expected_msg)
@@ -62,3 +65,5 @@ class ScoreTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+# TODO Исправьте ошибки оформления.
