@@ -73,8 +73,10 @@ class Bowling:
                 self.frames += 1
             if char.isdigit():
                 self.total_score += int(self.point(i))
-            else:
+            elif char in self.dict:
                 self.total_score += self.dict[char]()
+            else:
+                raise Exception('Некорректный символ')
 
         if self.frames < 10:
             raise Exception('Сыграно меньше 10 фреймов')

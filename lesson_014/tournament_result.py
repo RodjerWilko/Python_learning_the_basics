@@ -15,7 +15,8 @@ class TourResWriter:
         with open(file=self.file_in, mode='r', encoding='utf8') as file_in:
             with open(file=self.file_out, mode='w', encoding='utf8') as file_out:
                 for line in file_in:
-                    line_pars = line.split(' ')
+                    line_rep = line.replace('\t', ' ')
+                    line_pars = line_rep.split(' ')
 
                     if line_pars[0] == '###':  # Если начало тура
                         file_out.write(f'{line}')
@@ -43,8 +44,8 @@ class TourResWriter:
                             winner['name'] = name
                             winner['score'] = score
 
-                        line = line.replace('\n', '')
-                        file_out.write(f'{line.ljust(30, " ")} {score}\n')
+                        line = line_rep.replace('\n', '')
+                        file_out.write(f'{line.ljust(32, " ")}{score}\n')
 
                         if name in self.tour_stat:
                             self.tour_stat[name]['games'] += 1
@@ -64,3 +65,7 @@ class TourResWriter:
         for player in self.tour_stat:
             print(f'|{player[0]:^10}|{player[1]["games"]:^18}|{player[1]["winners"]:^14}|')
         print('+----------+------------------+--------------+')
+
+
+t = TourResWriter(file_in='file_in.txt')
+t.tour_result()

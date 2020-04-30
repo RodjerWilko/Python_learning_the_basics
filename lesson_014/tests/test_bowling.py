@@ -8,38 +8,43 @@ class ScoreTest(unittest.TestCase):
     def test_wrong_throws(self):
         with self.assertRaises(Exception) as exc:
             bowling = Bowling('1')
-            # TODO Если не используете result,
-            #  не нужно создавать переменную, можно просто вызвать функцию.
-            result = bowling.get_score()
+            bowling.get_score()
         expected_msg = 'Некорректное число бросков'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_less_ten_frames(self):
         with self.assertRaises(Exception) as exc:
             bowling = Bowling('12-536')
-            result = bowling.get_score()
+            bowling.get_score()
         expected_msg = 'Сыграно меньше 10 фреймов'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_more_ten_in_frame_or_not_spare(self):
         with self.assertRaises(Exception) as exc:
             bowling = Bowling('1165')
-            result = bowling.get_score()
+            bowling.get_score()
         expected_msg = 'Больше 10 в одном фрейме или не указан Spare'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_spare_only_second(self):
         with self.assertRaises(Exception) as exc:
             bowling = Bowling('25/-')
-            result = bowling.get_score()
+            bowling.get_score()
         expected_msg = 'Спэир может быть только вторым броском'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
-    def strike_only_first(self):
+    def test_strike_only_first(self):
         with self.assertRaises(Exception) as exc:
             bowling = Bowling('12-X')
-            result = bowling.get_score()
+            bowling.get_score()
         expected_msg = 'Страйк может быть только первым броском'
+        self.assertEqual(exc.exception.args[0], expected_msg)
+
+    def test_wrong_symbol_strike_only_first(self):
+        with self.assertRaises(Exception) as exc:
+            bowling = Bowling('12-D')
+            bowling.get_score()
+        expected_msg = 'Некорректный символ'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_only_strike(self):
@@ -65,5 +70,3 @@ class ScoreTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-# TODO Исправьте ошибки оформления.
