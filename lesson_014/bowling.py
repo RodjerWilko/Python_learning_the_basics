@@ -18,7 +18,7 @@ class Bowling:
         if self.throw_num == 1:
             return 20
         else:
-            raise Exception('Strike может быть только первым броском')
+            raise Exception('Страйк может быть только первым броском')
 
     def spare(self):
         """/"""
@@ -27,7 +27,7 @@ class Bowling:
             self.throw_num = 1
             return 15
         else:
-            raise Exception('Spare может быть только со второго броска')
+            raise Exception('Спэир может быть только вторым броском')
 
     def zero(self):
         """-"""
@@ -76,10 +76,7 @@ class Bowling:
             else:
                 self.total_score += self.dict[char]()
 
-        print(self.total_score)
-
         if self.frames < 10:
             raise Exception('Сыграно меньше 10 фреймов')
         else:
             return self.total_score
-# TODO В целом всё неплохо. Нужно доработать тесты.

@@ -25,8 +25,22 @@
 #
 # Из текущего файла сделать консольный скрипт для формирования файла с результатами турнира.
 # Параметры скрипта: --input <файл протокола турнира> и --output <файл результатов турнира>
+import argparse
 
-# TODO тут ваш код
+from tournament_result import TourResWriter
+
+
+def result_print():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', action='store', type=str, dest='input')
+    parser.add_argument('--output', action='store', type=str, dest='output')
+    args = parser.parse_args()
+    t = TourResWriter(args.input, args.output)
+    t.tour_result()
+
+
+if __name__ == '__main__':
+    result_print()
 
 # Усложненное задание (делать по желанию)
 #
