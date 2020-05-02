@@ -1,35 +1,56 @@
 class Bowling:
 
-    def __init__(self, game_result):
+    def __init__(self, game_result, rules=False):
+        """Если rules равно True, то подсчитывается по новым правилам, если False то по старым"""
         self.game_result = game_result
         self.dict = {
             'X': self.strike,
             '/': self.spare,
             '-': self.zero,
         }
-
         self.throw_num = 1
         self.total_score = 0
         self.frames = 0
+        self.rules_new = rules
 
-    def strike(self):
+    def strike(self, i):
         """X"""
 
         if self.throw_num == 1:
-            return 20
+            if not self.rules_new:
+                return 20
+            else:
+                if i == (len(self.game_result) - 2):
+                    return 20
+                elif i == (len(self.game_result) - 1):
+                    return 10
+                else:
+                    return 10 + self.get_score_one_throw(self.game_result[i + 1], i + 1) \
+                           + self.get_score_one_throw(self.game_result[i + 2], i + 2)
         else:
             raise Exception('Страйк может быть только первым броском')
 
-    def spare(self):
+    def spare(self, i):
         """/"""
 
         if self.throw_num == 2:
             self.throw_num = 1
-            return 15
+            if not self.rules_new:
+                return 15
+            else:
+                if i == (len(self.game_result) - 1):
+                    return 10
+                else:
+                    if self.game_result[i + 1].isdigit():
+                        return 10 + int(self.game_result[i + 1])
+                    elif self.game_result[i + 1] == 'X':
+                        return 20
+                    else:
+                        return 10
         else:
             raise Exception('Спэир может быть только вторым броском')
 
-    def zero(self):
+    def zero(self, i=0):
         """-"""
 
         if self.throw_num == 1:
@@ -62,7 +83,6 @@ class Bowling:
 
         elif self.throw_num == 2 and i == (len(self.game_result) - 1):
             return self.game_result[i]
-
         else:
             self.throw_num = 1
             return self.game_result[i]
@@ -74,7 +94,7 @@ class Bowling:
             if char.isdigit():
                 self.total_score += int(self.point(i))
             elif char in self.dict:
-                self.total_score += self.dict[char]()
+                self.total_score += self.dict[char](i)
             else:
                 raise Exception('Некорректный символ')
 
@@ -82,3 +102,18 @@ class Bowling:
             raise Exception('Сыграно меньше 10 фреймов')
         else:
             return self.total_score
+
+    def get_score_one_throw(self, char, i):
+        if char.isdigit():
+            return int(char)
+        elif char == '/':
+            if self.game_result[i - 1] == '-':
+                return 10
+            else:
+                return 10 - int(self.game_result[i - 1])
+        elif char == 'X':
+            return 10
+        elif char == '-':
+            return 0
+        else:
+            raise Exception('Некорректный символ')

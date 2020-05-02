@@ -37,10 +37,12 @@ from bowling import Bowling
 
 
 def scores():
+    """Если rules равно True, то подсчитывается по новым правилам, если False то по старым(по дефолту стоит False)"""
     parser = argparse.ArgumentParser()
     parser.add_argument('--result', action='store', type=str, dest='game_result')
+    parser.add_argument('--rules', action='store', type=bool, dest='rules')
     args = parser.parse_args()
-    b = Bowling(args.game_result)
+    b = Bowling(game_result=args.game_result, rules=args.rules)
 
     print(f'Количество очков для результатов {args.game_result} - {b.get_score()}')
 

@@ -5,65 +5,84 @@ from bowling import Bowling
 
 class ScoreTest(unittest.TestCase):
 
+    def test_new_riles_strike_and_spare(self):
+        b = Bowling('XXXXX5/4/3/-211', True)
+        result = b.get_score()
+        self.assertEqual(result, 176)
+
+    def test_new_rules_wrong_throws(self):
+        with self.assertRaises(Exception) as exc:
+            bowling = Bowling('1', True)
+            bowling.get_score()
+        expected_msg = 'Некорректное число бросков'
+        self.assertEqual(exc.exception.args[0], expected_msg)
+
+    def test_new_rules_less_ten_frames(self):
+        with self.assertRaises(Exception) as exc:
+            bowling = Bowling('12-536', True)
+            bowling.get_score()
+        expected_msg = 'Сыграно меньше 10 фреймов'
+        self.assertEqual(exc.exception.args[0], expected_msg)
+
     def test_wrong_throws(self):
         with self.assertRaises(Exception) as exc:
-            bowling = Bowling('1')
+            bowling = Bowling('1', False)
             bowling.get_score()
         expected_msg = 'Некорректное число бросков'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_less_ten_frames(self):
         with self.assertRaises(Exception) as exc:
-            bowling = Bowling('12-536')
+            bowling = Bowling('12-536', False)
             bowling.get_score()
         expected_msg = 'Сыграно меньше 10 фреймов'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_more_ten_in_frame_or_not_spare(self):
         with self.assertRaises(Exception) as exc:
-            bowling = Bowling('1165')
+            bowling = Bowling('1165', False)
             bowling.get_score()
         expected_msg = 'Больше 10 в одном фрейме или не указан Spare'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_spare_only_second(self):
         with self.assertRaises(Exception) as exc:
-            bowling = Bowling('25/-')
+            bowling = Bowling('25/-', False)
             bowling.get_score()
         expected_msg = 'Спэир может быть только вторым броском'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_strike_only_first(self):
         with self.assertRaises(Exception) as exc:
-            bowling = Bowling('12-X')
+            bowling = Bowling('12-X', False)
             bowling.get_score()
         expected_msg = 'Страйк может быть только первым броском'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_wrong_symbol_strike_only_first(self):
         with self.assertRaises(Exception) as exc:
-            bowling = Bowling('12-D')
+            bowling = Bowling('12-D', False)
             bowling.get_score()
         expected_msg = 'Некорректный символ'
         self.assertEqual(exc.exception.args[0], expected_msg)
 
     def test_only_strike(self):
-        b = Bowling('XXXXXXXXXX')
+        b = Bowling('XXXXXXXXXX', False)
         result = b.get_score()
         self.assertEqual(result, 200)
 
     def test_only_digits(self):
-        b = Bowling('34126316123413145254')
+        b = Bowling('34126316123413145254', False)
         result = b.get_score()
         self.assertEqual(result, 61)
 
     def test_only_zero(self):
-        b = Bowling('-11--55----1-2-3-4-5')
+        b = Bowling('-11--55----1-2-3-4-5', False)
         result = b.get_score()
         self.assertEqual(result, 27)
 
     def test_all(self):
-        b = Bowling('X-2344/4/--12X231-')
+        b = Bowling('X-2344/4/--12X231-', False)
         result = b.get_score()
         self.assertEqual(result, 88)
 
