@@ -31,13 +31,11 @@ from tournament_result import TourResWriter
 
 
 def result_print():
-    """Если rules равно True, то подсчитывается по новым правилам, если False то по старым(по дефолту стоит False)"""
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', action='store', type=str, dest='input')
     parser.add_argument('--output', action='store', type=str, dest='output')
-    parser.add_argument('--rules', action='store', type=bool, dest='rules')
     args = parser.parse_args()
-    t = TourResWriter(file_in=args.input, file_out=args.output, rules=args.rules)
+    t = TourResWriter(file_in=args.input, file_out=args.output)
     t.tour_result()
 
 

@@ -2,13 +2,11 @@ from bowling import Bowling
 
 
 class TourResWriter:
-    """Если rules равно True, то подсчитывается по новым правилам, если False то по старым(по дефолту стоит False)"""
 
-    def __init__(self, file_in, file_out='tournament_result.txt', rules=False):
+    def __init__(self, file_in, file_out='tournament_result.txt'):
         self.file_in = file_in
         self.file_out = file_out
         self.tour_stat = {}
-        self.rules = rules
 
     def tour_result(self):
         """Выводит результат в файл tournament_result.txt"""
@@ -39,7 +37,7 @@ class TourResWriter:
 
                         name = line_pars[0]
                         result = line_pars[1]
-                        b = Bowling(result.replace('\n', '', self.rules))
+                        b = Bowling(result.replace('\n', ''))
                         score = b.get_score()
 
                         if score > winner['score']:

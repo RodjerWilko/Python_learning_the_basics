@@ -1,6 +1,6 @@
 class Bowling:
 
-    def __init__(self, game_result, rules=False):
+    def __init__(self, game_result):
         """Если rules равно True, то подсчитывается по новым правилам, если False то по старым"""
         self.game_result = game_result
         self.dict = {
@@ -11,22 +11,12 @@ class Bowling:
         self.throw_num = 1
         self.total_score = 0
         self.frames = 0
-        self.rules_new = rules
 
     def strike(self, i):
         """X"""
 
         if self.throw_num == 1:
-            if not self.rules_new:
-                return 20
-            else:
-                if i == (len(self.game_result) - 2):
-                    return 20
-                elif i == (len(self.game_result) - 1):
-                    return 10
-                else:
-                    return 10 + self.get_score_one_throw(self.game_result[i + 1], i + 1) \
-                           + self.get_score_one_throw(self.game_result[i + 2], i + 2)
+            return 20
         else:
             raise Exception('Страйк может быть только первым броском')
 
@@ -35,18 +25,7 @@ class Bowling:
 
         if self.throw_num == 2:
             self.throw_num = 1
-            if not self.rules_new:
-                return 15
-            else:
-                if i == (len(self.game_result) - 1):
-                    return 10
-                else:
-                    if self.game_result[i + 1].isdigit():
-                        return 10 + int(self.game_result[i + 1])
-                    elif self.game_result[i + 1] == 'X':
-                        return 20
-                    else:
-                        return 10
+            return 15
         else:
             raise Exception('Спэир может быть только вторым броском')
 
@@ -102,6 +81,40 @@ class Bowling:
             raise Exception('Сыграно меньше 10 фреймов')
         else:
             return self.total_score
+
+
+class NewRulesBowling(Bowling):
+
+    def strike(self, i):
+        """X"""
+
+        if self.throw_num == 1:
+            if i == (len(self.game_result) - 2):
+                return 20
+            elif i == (len(self.game_result) - 1):
+                return 10
+            else:
+                return 10 + self.get_score_one_throw(self.game_result[i + 1], i + 1) \
+                       + self.get_score_one_throw(self.game_result[i + 2], i + 2)
+        else:
+            raise Exception('Страйк может быть только первым броском')
+
+    def spare(self, i):
+        """/"""
+
+        if self.throw_num == 2:
+            self.throw_num = 1
+            if i == (len(self.game_result) - 1):
+                return 10
+            else:
+                if self.game_result[i + 1].isdigit():
+                    return 10 + int(self.game_result[i + 1])
+                elif self.game_result[i + 1] == 'X':
+                    return 20
+                else:
+                    return 10
+        else:
+            raise Exception('Спэир может быть только вторым броском')
 
     def get_score_one_throw(self, char, i):
         if char.isdigit():

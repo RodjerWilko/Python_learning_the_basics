@@ -33,16 +33,14 @@ import argparse
 # Из текущего файла сделать консольную утилиту для определения количества очков, с помощью пакета argparse
 # Скрипт должен принимать параметр --result и печатать на консоль:
 #   Количество очков для результатов ХХХ - УУУ.
-from bowling import Bowling
+from bowling import Bowling, NewRulesBowling
 
 
 def scores():
-    """Если rules равно True, то подсчитывается по новым правилам, если False то по старым(по дефолту стоит False)"""
     parser = argparse.ArgumentParser()
     parser.add_argument('--result', action='store', type=str, dest='game_result')
-    parser.add_argument('--rules', action='store', type=bool, dest='rules', default=True)
     args = parser.parse_args()
-    b = Bowling(game_result=args.game_result, rules=args.rules)
+    b = NewRulesBowling(game_result=args.game_result)
 
     print(f'Количество очков для результатов {args.game_result} - {b.get_score()}')
 
@@ -50,12 +48,6 @@ def scores():
 if __name__ == '__main__':
     scores()
 
-# TODO Аргумент --rules с логическим типом лучше доработать по одному из вариантов:
-#  https://stackoverflow.com/questions/52403065/argparse-optional-boolean
-#  https://stackoverflow.com/questions/41655897/why-is-argparse-not-parsing-my-boolean-flag-correctly
-# TODO В целом код работает верно, но лучше реализовать новую версию правил добавлением нового
-#  класса, наследника Bowling, в котором будут переопределены методы подсчёта страйки и спэйра.
 # При написании кода помнить, что заказчик может захотеть доработок и новых возможностей...
 # И, возможно, вам пригодится паттерн проектирования "Состояние",
 #   см https://clck.ru/Fudd8 и https://refactoring.guru/ru/design-patterns/state
-
