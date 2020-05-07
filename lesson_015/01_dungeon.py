@@ -100,11 +100,8 @@ from decimal import Decimal
 
 from termcolor import cprint, COLORS
 
-# TODO Можно не сохранять полное название выхода, а проверять наличие Hatch
-#  в названии комнаты.
-FINAL_ROOM = 'Hatch_tm159.098765432'
 remaining_time = '123456.0987654321'
-field_names = ['current_location', 'current_experience', 'current_date']
+field_names = ['current_location', 'current_experience', 'time left', 'current_date']
 DICT_TEXTS = {
     'win': "\nУРА!!!! ВЫ ВЫБРАЛИСЬ ИЗ ПОДЗЕМЕЛЬЯ И УБИЛИ ВСЕХ МОНСТРОВ!!!!",
     'lose_time': """\nВы не успели открыть люк!!! НАВОДНЕНИЕ!!! Алярм!
@@ -112,7 +109,6 @@ DICT_TEXTS = {
                      \rНо что это?! Вы воскресли у входа в пещеру... Не зря матушка дала вам оберег :)
                      \rНу, на этот-то раз у вас все получится! Трепещите, монстры!
                      \rВы осторожно входите в пещеру...""",
-    'lose_dead_end': "\nК сожалению вы попали в тупик, попробуйте еще раз",
     'exit': "\nВы вышли, но мы все равно записали когда это было",
     'begin': """\n...Подземелье было выкопано ящеро-подобными монстрами рядом с аномальной рекой,
                  \rпостоянно выходящей из берегов. Из-за этого подземелье регулярно затапливается, монстры выживают,
@@ -128,49 +124,54 @@ DICT_TEXTS = {
                 \rЧтобы открыть люк ("Hatch") и выбраться через него на поверхность, нужно иметь не менее 280 очков опыта.
                 \rЕсли до открытия люка время заканчивается - герой задыхается и умирает, воскрешаясь перед входом в подземелье,
                 \rготовый к следующей попытке (игра начинается заново)."""
-
 }
 
 
 class Game:
 
     def __init__(self):
-        # TODO Начальное значение curr_loc лучше сделать словарём. Строка
-        #  вводит в заблуждение читающего код и анализатор в pycharm.
-        #  То же самое косается curr_loc_n.
-        #  Предназначение этих переменных и их отличие сразу не понятны.
-        #  В этом нужно разобраться. Добавьте пожалуйста строки документации
-        #  (docstring) к методам класса Game.
-        self.curr_loc = ''
-        self.curr_loc_n = ''
-        self.curr_exp = 0
-        self.list_mons = []
-        self.list_rooms = []
-        self.elaps_time = Decimal('0.00')
-        self.rem_time = Decimal(remaining_time)
-        self.user_num = 0
-        self.num_mon = 0
-        self.mons = ''
+        self.curr_loc = {}  # текущая локация (значение из словаря локации)
+        self.curr_loc_n = ''  # имя текущей локации (ключ из словаря локации)
+        self.curr_exp = 0  # текущий опыт
+        self.list_mons = []  # временный список монстров в текущей локации
+        self.list_rooms = []  # временный список локация для перехода в текущей локации
+        self.elaps_time = Decimal('0.00')  # времени прошло
+        self.rem_time = Decimal(remaining_time)  # общее время изначально
+        self.time_left = Decimal('0.00')  # оставшееся время
+        self.user_num = 0  # ввод пользователя
+        self.num_mon = 0  # ввод пользователя
+        self.user_input = 0  # ввод пользователя
+        self.mons = ''  # текущий монстр
 
     def open_json(self):
+        """создает файл csv с названиями таблиц и обнуляет значения атрибутов"""
         with open('rpg.json', 'r')as file_map:
             self.curr_loc = json.load(file_map)
             self.curr_exp = 0
             self.rem_time = Decimal(remaining_time)
             self.elaps_time = Decimal('0.00')
+        with open('score.csv', 'a', newline='') as out_csv:
+            writer = csv.DictWriter(out_csv, delimiter=',', fieldnames=field_names)
+            writer.writeheader()
 
     def where_i_am(self):
+        """
+        проверяет сколько времени осталось до наводнения, в какой локации находится игрок
+        и записывает текущих монстров и локации во временные списки
+
+        """
+        self.time_left = self.rem_time - self.elaps_time
         self.list_mons = []
         self.list_rooms = []
         for k, v in self.curr_loc.items():
             self.curr_loc_n = k
             cprint(f'\n<<<Вы находитесь в {self.curr_loc_n}>>>', color='green')
-        cprint(f'\nУ вас {self.curr_exp} опыта и осталось {self.rem_time - self.elaps_time} секунд до наводнения',
+        cprint(f'\nУ вас {self.curr_exp} опыта и осталось {self.time_left} секунд до наводнения',
                color='yellow')
-        if (self.rem_time - self.elaps_time) < 0:
+        if (self.rem_time - self.elaps_time) < 0:  # если времени осталось меньше нуля вызов game_over('lose_time')
             self.game_over('lose_time')
         else:
-            if self.curr_loc_n == FINAL_ROOM:
+            if 'Hatch' in self.curr_loc_n:  # если в имени текущей локации есть 'Hatch' то вызов game_over('win')
                 self.game_over('win')
             else:
                 cprint(f'Прошло времени: {self.elaps_time}\n', color='white')
@@ -185,154 +186,152 @@ class Game:
                                 cprint(f"- Вход в локацию:  {k}", color='grey')
                                 self.list_rooms.append([k, i])
 
-    # TODO Функцию what_i_can_do сложно понять, без внимательного чтения.
-    #  Размер функции довольно большой. Лучше разделить её на несколько:
-    #  - Основное меню и выбор действия;
-    #  - Подменю 1 с монстрами и обработка ввода;
-    #  - Логика взаимодействия с монстрами;
-    #  - Подменю 2 с переходом в другие локации;
-    #  - Логика перехода в другую локацию.
-    #  Попробуйте изменить логику обработки так, чтобы уменьшить количество вызываемых
-    #  и обрабатываемых исключений. Сейчас их, на мой взгляд, слишком много.
-    #  Например исключение IndexError с выводом одинакового сообщения НЕТ ТАКОГО МОНСТРА!!!
-    #  вы обрабатываете в нескольких местах.
-    #  Возможно стоит сделать одну общую функцию для вывода меню и проверки ввода.
-    def what_i_can_do(self):
+    def error_message(self):
+        """ вывод сообщения об ошибке с паузой в 2 секунды"""
+
+        cprint('\n!!! ОШИБКА! ВЫ ВВЕЛИ НЕВРНЫЙ СИМВОЛ !!!', color='red')
+        time.sleep(2)
+
+    def main_menu_choose(self):
+        """ вывод выбора действия с получением ответа от пользователя"""
         cprint('Выберите действие:'
                '\n1.Атаковать монстра'
                '\n2.Перейти в другую локацию'
                '\n3.Сдаться и выйти из игры', color='white')
-        try:
-            user_input = int(input('Введите число: '))
-        except ValueError:
-            cprint('\n!!! ВВЕДЕН НЕВЕРНЫЙ ФОРМАТ !!!', color='red')
+        self.user_input = int(input('Введите число: '))
+
+    def attack_monster(self):
+        """ вывод меню атаки монстра, с получением от пользователя номера монстра"""
+        print('\nВы выбрали сражаться с монстром')
+        for i, mon in enumerate(self.list_mons):
+            cprint(f'{i + 1}.{mon}', color='grey')
+        self.num_mon = int(input('\nВведите номер монстра с которым хотите сразиться: '))
+        if self.num_mon > len(self.list_mons) or self.num_mon <= 0:
+            raise IndexError
+
+    def logic_attack_monster(self):
+        """логика атаки монстра"""
+        self.mons = self.list_mons[self.num_mon - 1]
+        mons_pars = self.mons.split('_')
+        exp = int(mons_pars[1].replace('exp', ''))
+        tm = float(mons_pars[2].replace('tm', ''))
+        self.curr_exp += exp
+        self.curr_loc[self.curr_loc_n].remove(self.mons)
+        self.elaps_time += int(tm)
+
+    def go_to_location(self):
+        """вывод меню перехода в локацию, с получением от пользователя номера локации"""
+        print('\nВы выбрали переход в локацию')
+        for n, loc in enumerate(self.list_rooms):
+            cprint(f'{n + 1}.{loc[0]}', color='grey')
+        self.user_num = int(input('\nВведите номер локации в которую хотите перейти: '))
+        if self.user_num > len(self.list_rooms) or self.user_num <= 0:
+            raise IndexError
+
+    def logic_go_to_location(self):
+        """логика перехода в локацию"""
+        self.test_location()
+        tm = self.list_rooms[self.user_num - 1][0].split('_')[2]
+        tm = Decimal(tm.replace('tm', ''))
+        self.elaps_time += tm
+        self.time_left = self.rem_time - self.elaps_time
+        self.write_csv()
+
+    def final_room(self):
+        """логика если пользователь выбрал финальную локацию"""
+        win_room_tm = self.list_rooms[self.user_num - 1][0]
+        win_room_tm = win_room_tm.split('_')
+        win_room_tm = Decimal(win_room_tm[1].replace('tm', ''))
+        if self.curr_exp >= 280:
+            self.test_location()
+            self.elaps_time += win_room_tm
+        else:
+            cprint('\n!!! ОЧКОВ ОПЫТА НЕДОСТАТОЧНО ЧТОБЫ ОТКРЫТЬ ЛЮК !!!', color='red')
             time.sleep(2)
+
+    def what_i_can_do(self):
+        """меню с выводом вариантов действий"""
+        try:
+            self.main_menu_choose()
+        except ValueError:
+            self.error_message()
         else:
 
-            if user_input == 1:  # сразиться с монстром
+            if self.user_input == 1:  # сразиться с монстром
                 if self.list_mons:
-                    print('\nВы выбрали сражаться с монстром')
-                    for i, mon in enumerate(self.list_mons):
-                        cprint(f'{i + 1}.{mon}', color='grey')
                     try:
-                        self.num_mon = int(input('\nВведите номер монстра с которым хотите сразиться: '))
-                        if self.num_mon > len(self.list_mons) or self.num_mon <= 0:
-                            raise IndexError
-                    except ValueError:
-                        cprint('\n!!! ВВЕДЕН НЕВЕРНЫЙ ФОРМАТ !!!', color='red')
-                        time.sleep(2)
-                    except IndexError:
-                        cprint('\n!!!! НЕТ ТАКОГО МОНСТРА!!!', color='red')
-                        self.except_continue()
-                    else:
-                        self.mons = self.list_mons[self.num_mon - 1]
-                        mons_pars = self.mons.split('_')
-                        exp = int(mons_pars[1].replace('exp', ''))
-                        tm = float(mons_pars[2].replace('tm', ''))
-                        self.curr_exp += exp
-                        self.curr_loc[self.curr_loc_n].remove(self.mons)
-                        self.elaps_time += int(tm)
-
+                        self.attack_monster()
+                        self.logic_attack_monster()
+                    except Exception:
+                        self.error_message()
                 else:
-                    cprint('\n!!! В ДАННОЙ ЛОКАЦИИ БОЛЬШЕ НЕТ МОНСТРОВ !!!!', color='red')
-                    self.list_rooms = []
-                    time.sleep(2)
+                    self.error_message()
 
-            elif user_input == 2:  # переход в локацию
-                print('\nВы выбрали переход в локацию')
+            elif self.user_input == 2:  # переход в локацию
                 if not self.list_rooms:
-                    cprint('\n!!! БОЛЬШЕ НЕТ ЛОКАЦИЙ !!!', color='red')
-                    time.sleep(2)
+                    self.error_message()
                 else:
-                    for n, loc in enumerate(self.list_rooms):
-                        cprint(f'{n + 1}.{loc[0]}', color='grey')
                     try:
-                        self.user_num = int(input('\nВведите номер локации в которую хотите перейти: '))
-                        if self.user_num > len(self.list_rooms) or self.user_num <= 0:
-                            raise IndexError
-                    except ValueError:
-                        cprint('\n!!! ВВЕДЕН НЕВЕРНЫЙ ФОРМАТ !!!', color='red')
-                        time.sleep(2)
-                    except IndexError:
-                        cprint('\n!!!! НЕТ ТАКОЙ ЛОКАЦИИ !!!', color='red')
-                        self.except_continue()
-                    else:
-                        if self.list_rooms[self.user_num - 1][0] == FINAL_ROOM:
-                            win_room_tm = self.list_rooms[self.user_num - 1][0]
-                            win_room_tm = win_room_tm.split('_')
-                            win_room_tm = Decimal(win_room_tm[1].replace('tm', ''))
-                            if self.curr_exp >= 280:
-                                self.test_location()
-                                self.elaps_time += win_room_tm
-                            else:
-                                cprint('\n!!! ОЧКО ОПЫТА НЕДОСТАТОЧНО ЧТОБЫ ОТКРЫТЬ ЛЮК !!!', color='red')
-                                time.sleep(2)
+                        self.go_to_location()
+                        if 'Hatch' in self.list_rooms[self.user_num - 1][0]:
+                            self.final_room()
                         else:
-                            self.test_location()
-                            tm = self.list_rooms[self.user_num - 1][0].split('_')[2]
-                            tm = Decimal(tm.replace('tm', ''))
-                            self.elaps_time += tm
+                            self.logic_go_to_location()
+                    except Exception:
+                        self.error_message()
 
-            elif user_input == 3:  # выход из игры по желанию пользователя
+            elif self.user_input == 3:  # выход из игры по желанию пользователя
                 self.game_over('exit')
 
             else:
-                cprint('\n!!! НЕТ ТАКОГО ЧИСЛА, ВВЕДИТЕ ЧИСЛО ИЗ СПИСКА!!!!!', color='red')
-                time.sleep(2)
+                self.error_message()
 
-    def test_location(self):
+    def test_location(self):  # проверка на правильно введенную локацию
         try:
             self.curr_loc = self.curr_loc[self.curr_loc_n][self.list_rooms[self.user_num - 1][1]]
         except IndexError:
-            cprint('!!!! НЕТ ТАКОЙ ЛОКАЦИИ!!!', color='red')
-            self.except_continue()
+            self.error_message()
 
     def except_continue(self):
         time.sleep(2)
         self.what_i_can_do()
 
-    def write_csv(self):
+    def write_csv(self):  # запись в csv файл результатов игры
         date = datetime.datetime.now()
         dict_end = [{'current_location': self.curr_loc_n,
                      'current_experience': self.curr_exp,
+                     'time left': self.rem_time - self.elaps_time,
                      'current_date': date.strftime("%Y-%m-%d %H:%M")}]
 
         with open('score.csv', 'a', newline='') as out_csv:
             writer = csv.DictWriter(out_csv, delimiter=',', fieldnames=field_names)
-            writer.writeheader()
             writer.writerows(dict_end)
 
     def game_over(self, text):
-        if text == 'exit':
+        """варианты окончанию игры в зависимости от победы проигрыша или выбора пользователя"""
+        if text == 'exit':  # если пользователь сам выбрал выход
             print(DICT_TEXTS['exit'])
             self.write_csv()
             time.sleep(2)
             exit()
 
-        elif text == 'lose_time':
+        elif text == 'lose_time':  # Если закончилось время
             cprint(DICT_TEXTS['lose_time'], color='red')
             time.sleep(4)
             self.open_json()
             self.where_i_am()
             self.write_csv()
 
-        elif text == 'lose_dead_end':
-            print(DICT_TEXTS['lose_dead_end'])
-            time.sleep(2)
-            self.open_json()
-            self.where_i_am()
-            self.write_csv()
-
-        else:
+        else:  # если пользоватеь победил
             for color in COLORS:
                 cprint(DICT_TEXTS['win'], color=color)
                 time.sleep(0.5)
-
             self.write_csv()
             exit()
 
 
 def start_game():
+    """ старт игры """
     g = Game()
     g.open_json()
     cprint(DICT_TEXTS['begin'], color='green')
@@ -344,10 +343,3 @@ def start_game():
 
 if __name__ == '__main__':
     start_game()
-
-# TODO В лог файл нужно заносить все локации, через который про
-#  проходил игрок. Желательно в случае победы добавить в лог оставлееся время.
-#  Так я смогу дополнительно проверить правильность работы игры.
-# TODO Подумайте над тем, чтобы добавить класс игрока. В нём можно будет сохранять
-#  опыт и затраченное время, а кроме того из этого класса можно записывать лог.
-#  Это делать не обязательно. Просто предлагаю идеи.

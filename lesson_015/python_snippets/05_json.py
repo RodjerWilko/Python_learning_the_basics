@@ -38,7 +38,7 @@
 #   "LastName": "Cobb",
 #   "Address": {
 #       "city": "Los Angeles",
-#       "StreetAdress": "S Olive st 617",
+#       "StreetAddress": "S Olive st 617",
 #   },
 #   "ContactDetails": {
 #       "PhoneNumbers": ["+1 212-626-8118", "+1 212-484-4554"],
