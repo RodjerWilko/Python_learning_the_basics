@@ -1,3 +1,4 @@
+from copy import deepcopy
 from unittest import TestCase
 from unittest.mock import patch, Mock, ANY
 
@@ -33,6 +34,19 @@ class Test1(TestCase):
                  'group_id': 194634835,
                  'event_id': 'b2de1165685155db8ebbb06f1ec68260e005acbd'}
 
+    CONTEXT = {
+        'city_out': 'москва',
+        'city_in': 'санкт-петербург',
+        'date': '10-04-2020',
+        'num_of_flights': [['1', '10-05-2020', '14:00'], ['2', '11-05-2020', '14:00'], ['3', '12-05-2020', '14:00'],
+                           ['4', '13-05-2020', '14:00'], ['5', '14-05-2020', '14:00']], 'num_flight': '5',
+        'date_flight': '14-05-2020',
+        'time_flight': '14:00',
+        'sits': '4',
+        'comment': '1',
+        'phone': '89176561453'
+    }
+
     def test_run(self):
         count = 5
         obj = {'a': 1}
@@ -51,7 +65,7 @@ class Test1(TestCase):
                 bot.on_event.asser_any_call(obj)
                 assert bot.on_event.call_count == count
 
-    def test_on_event(self):
+    def test_on_event(self):  # проверяем на стандартный ответ
         event = VkBotMessageEvent(self.RAW_EVENT)
         send_mock = Mock()
         with patch('bot.vk_api.VkApi'):
@@ -62,7 +76,108 @@ class Test1(TestCase):
                 bot.on_event(event)
 
         send_mock.assert_called_once_with(
-            message=f"Мы получили сообщение от Вас : {self.RAW_EVENT['object']['message']['text']}",
+            message=f"Наберите команду - /help для помощи",
             random_id=ANY,
             peer_id=self.RAW_EVENT['object']['message']['peer_id']
         )
+
+    def test_on_event1(self):  # проверка на ответ после /ticket
+        event = deepcopy(self.RAW_EVENT)
+        event['object']['message']['text'] = '/ticket'
+        event = VkBotMessageEvent(event)
+        send_mock = Mock()
+        with patch('bot.vk_api.VkApi'):
+            with patch('bot.VkBotLongPoll'):
+                bot = Bot('', '')
+                bot.api = Mock()
+                bot.api.messages.send = send_mock
+                bot.on_event(event)
+
+        send_mock.assert_called_once_with(
+            message=f"Вы запустили помощника для заказа билета на самолет \nВведите город отправения: ",
+            random_id=ANY,
+            peer_id=self.RAW_EVENT['object']['message']['peer_id']
+        )
+
+    def test_on_event2(self):  # проверка на ответ после /help
+        event = deepcopy(self.RAW_EVENT)
+        event['object']['message']['text'] = '/help'
+        event = VkBotMessageEvent(event)
+        send_mock = Mock()
+        with patch('bot.vk_api.VkApi'):
+            with patch('bot.VkBotLongPoll'):
+                bot = Bot('', '')
+                bot.api = Mock()
+                bot.api.messages.send = send_mock
+                bot.on_event(event)
+
+        send_mock.assert_called_once_with(
+            message=f"Это чат-бот предназначенный для заказа билета на самолет, чтобы заказать "
+                    f"билет включите помощника командой - /ticket, чтобы в процессе заказа начать"
+                    f" заново -наберите также - /ticket",
+            random_id=ANY,
+            peer_id=self.RAW_EVENT['object']['message']['peer_id']
+        )
+
+    def test_correct_check(self):  # проверка правильности вывода введеных данных
+        user_id = self.RAW_EVENT['object']['message']['peer_id']
+        state = Mock()
+        state.context = self.CONTEXT
+        send_mock = Mock()
+        with patch('bot.vk_api.VkApi'):
+            with patch('bot.VkBotLongPoll'):
+                bot = Bot('', '')
+                bot.api = Mock()
+                bot.api.messages.send = send_mock
+                bot.correct_check(user_id, state)
+
+        send_mock.assert_called_once_with(
+            message='\nгород отправления: \nМосква\n \nгород назначения: \nСанкт-петербург\n\nдата отправления:'
+                    ' \n14-05-2020\n\nномер рейса: \n№5\n\nвремя отправления: \n14:00\n\nколичество мест:'
+                    ' \n4\n\nваш комментарий:\n1\n',
+            random_id=ANY,
+            peer_id=user_id
+        )
+
+    def test_fail_city_out_action(self):  # проверка списка доступных город для отправлений
+        user_id = self.RAW_EVENT['object']['message']['peer_id']
+        send_mock = Mock()
+        with patch('bot.vk_api.VkApi'):
+            with patch('bot.VkBotLongPoll'):
+                bot = Bot('', '')
+                bot.api = Mock()
+                bot.api.messages.send = send_mock
+                bot.fail_city_out_action(user_id)
+
+        send_mock.assert_called_once_with(
+            message='\nМосква\nСанкт-петербург\nНью-йорк\nПариж',
+            random_id=ANY,
+            peer_id=user_id
+        )
+
+    def test_dispatcher(self):
+        user_id = self.RAW_EVENT['object']['message']['peer_id']
+        state = Mock()
+        state.context = self.CONTEXT
+        send_mock = Mock()
+        with patch('bot.vk_api.VkApi'):
+            with patch('bot.VkBotLongPoll'):
+                bot = Bot('', '')
+                bot.api = Mock()
+                bot.api.messages.send = send_mock
+                bot.dispatcher(user_id, state)
+
+        send_mock.assert_called_once_with(
+            message='\n№ рейса: 1\nдата отправления: 10-05-2020 \nвремя отправления: 14:00'
+                    '\n\n№ рейса: 2\nдата отправления: 11-05-2020 \nвремя отправления: 14:00'
+                    '\n\n№ рейса: 3\nдата отправления: 12-05-2020 \nвремя отправления: 14:00'
+                    '\n\n№ рейса: 4\nдата отправления: 13-05-2020 \nвремя отправления: 14:00'
+                    '\n\n№ рейса: 5\nдата отправления: 14-05-2020 \nвремя отправления: 14:00'
+                    '\n\nВыберите номер рейса из списка: ',
+            random_id=ANY,
+            peer_id=user_id
+        )
+
+
+
+
