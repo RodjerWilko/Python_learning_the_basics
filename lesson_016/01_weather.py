@@ -51,6 +51,7 @@ import datetime
 from itertools import zip_longest
 import requests
 import cv2
+from weather_menu import WeatherMenu as Wm
 from bs4 import BeautifulSoup
 from playhouse.db_url import connect
 from dateutil.relativedelta import relativedelta
@@ -61,13 +62,14 @@ CITY = 'cheboksary'
 NOW_DATE = datetime.datetime.now()
 IMAGE = 'python_snippets/external_data/probe.jpg'
 
-
 PICTURES = {
     'облачно': 'python_snippets/external_data/weather_img/cloud.jpg',
     'дождь': 'python_snippets/external_data/weather_img/rain.jpg',
     'снег': 'python_snippets/external_data/weather_img/snow.jpg',
     'ясно': 'python_snippets/external_data/weather_img/sun.jpg'
 }
+
+URL = 'postgresql://postgres:123456@localhost:5432/weather'
 
 
 class WeatherMaker:
@@ -114,50 +116,23 @@ class WeatherMaker:
                         weather_dict['погода'] = weather_name.text.replace('\n', '')
                     self.weather_list.append(weather_dict)
 
-    def print_14_day(self, mode, n):
-        """выводит в консоль прогноз за предыдущие(mode=last_d) 'n' дней или cледующие(mode=next_d) в отличии от mode
-        """
-        for i, day in enumerate(self.weather_list):
-            if self.today_date_pars == day['дата']:
-                if mode == 'last_d':
-                    print(f'\nПогода на {n} дней назад: ')
-                    self.temp_list = []
-                    for day_dict in self.weather_list[i - n:i]:
-                        self.write_temp_dict(day_dict)
-                        print(
-                            f'Дата : {day_dict["дата"]}, Погода: {day_dict["погода"]}, '
-                            f'Температура днем: {day_dict["температура_днем"]}, '
-                            f'Температура ночью: {day_dict["температура_ночью"]}')
-
-                elif mode == 'next_d':
-                    print(f'\nПогода на {n} дней вперед: ')
-                    self.temp_list = []
-                    for day_dict in self.weather_list[i:i + n]:
-                        self.write_temp_dict(day_dict)
-                        print(
-                            f'Дата : {day_dict["дата"]}, Погода: {day_dict["погода"]}, '
-                            f'Температура днем: {day_dict["температура_днем"]}, '
-                            f'Температура ночью: {day_dict["температура_ночью"]}')
-
-    def write_temp_dict(self, day_dict):  # запись во временный словарь
-        temp_dict = {}
-        temp_dict['дата'] = day_dict["дата"]
-        temp_dict['погода'] = day_dict["погода"]
-        temp_dict['температура_днем'] = day_dict["температура_днем"]
-        temp_dict['температура_ночью'] = day_dict["температура_ночью"]
-        self.temp_list.append(temp_dict)
-
 
 class ImageMaker:
-    def __init__(self, w_dict):
+    def __init__(self):
+        self.image = ''
+        self.date = ''
+        self.t_day = ''
+        self.t_night = ''
+        self.desc = ''
+
+    def create_picture(self, w_dict):
         self.image = cv2.imread(IMAGE)
         self.date = w_dict['дата']
         self.t_day = w_dict['температура_днем']
         self.t_night = w_dict['температура_ночью']
         self.desc = w_dict['погода']
 
-    def create_picture(self):
-        image_with_line = self.sun()
+        image_with_line = self.gradient()
 
         image_with_line = self.write_text(image_with_line, f'Дата: {self.date}', (0, 30))
         image_with_line = self.write_text(image_with_line, f'Температура днем: {self.t_day}', (0, 70))
@@ -177,144 +152,78 @@ class ImageMaker:
                              color=(0, 0, 0))
         return image_
 
-    def sun(self):
+    def gradient(self):
+        list_col = []
+        if self.desc == 'ясно':
+            list_col = [0, 255, 255, 0, 0]
+        elif self.desc == 'дождь':
+            list_col = [255, 0, 0, 0, 0]
+        elif self.desc == 'облачно':
+            list_col = [128, 128, 128, 0, 0]
+        elif self.desc == 'снег':
+            list_col = [255, 191, 0, 0, 0]
         image = self.image.copy()
-        for x in range(0, 255):
-            cv2.line(image, (0, x), (510, x), (x, 255, 255), 1)
-        return image
-
-    def rain(self):
-        image = self.image.copy()
-        for x in range(0, 255):
-            cv2.line(image, (0, x), (510, x), (255, x, x), 1)
-        return image
-
-    def snow(self):
-        image = self.image.copy()
-        for x in range(0, 255):
-            y = 0
-            if y > 64:
-                y = 0
-            else:
-                y = x
-            cv2.line(image, (0, x), (510, x), (255, 191 + y, x), 1)
-        return image
-
-    def cloud(self):
-        image = self.image.copy()
-        for x in range(0, 128):
-            cv2.line(image, (0, x), (510, x), (128 + x, 128 + x, 128 + x), 1)
+        while list_col[4] < 255:
+            for i, j in enumerate(list_col):
+                if j < 255:
+                    list_col[i] += 1
+            cv2.line(image, (0, list_col[3]), (510, list_col[4]), (list_col[0], list_col[1], list_col[2]), 1)
         return image
 
 
 class DatabaseUpdater:
-    """Класс работы с базой данных, поключение, добавление данных, получение данных
+    """Класс работы с базой данных, поключение, добавление данных, получение данных """
 
-    """
-    # TODO Хорошо бы параметром передавать и ссылку и dbp
-    # TODO И в init инициализировать это всё. В init Так же можно создание таблицы добавить
-    db = connect('postgresql://postgres:123456@localhost:5432/weather')
-    dbp.initialize(db)
+    def __init__(self, url, proxy):
+        self.dbp = proxy
+        self.db = connect(url)
+        self.dbp.initialize(self.db)
+        self.dbp.create_tables([UserTable], safe=True)
 
     def add_days(self, w_list):  # добавление выбранного диапозон в базу
-        dbp.create_tables([UserTable], safe=True)
         for day in w_list:
-            new_w = UserTable(date=day['дата'], t_day=day['температура_днем'], t_night=day['температура_ночью'],
-                              desc=day['погода'])
+            new_w = UserTable(date=day['дата'],
+                              t_day=day['температура_днем'],
+                              t_night=day['температура_ночью'],
+                              desc=day['погода']
+                              )
             new_w.save()
 
     def get_days(self):  # получение всех данных из базы
         for day in UserTable.select():
             print(
-                f'Дата: {day.date}, Погода: {day.desc}, Температура днем {day.t_day}, Температура ночью {day.t_night}')
-
-# TODO Менюшки хорошо бы вынести в отдельный модуль (как было с игрой быки и коровы)
-# TODO И там объединить в класс. + можно по желанию добавить argparse
-def menu_first():  # вывод меню №1 с дальнейшей логикой
-    print('\nВыберите диапозон дат для вывода прогноза на консоль:')
-    print('\n1. Прогноз с сегодняшнего дня и на 14 дней вперед \n2. Прогноз на 14 дней назад')
-
-    user_input = input('\nВведите номер пункта меню: ')
-
-    if user_input == '1':
-        weather.print_14_day('next_d', 14)
-    elif user_input == '2':
-        weather.print_14_day('last_d', 14)
-    else:
-        print('Введен неверный номер')
-        menu_first()
-
-
-def menu_second():  # вывод меню №2 с дальнейшей логикой
-    print('\nХотите записать резльтаты в базу данных?')
-    print('\n1. Да \n2. Нет')
-
-    user_input = input('\nВведите номер пункта меню: ')
-
-    if user_input == '1':
-        try:
-            base.add_days(weather.temp_list)
-        except Exception:
-            print('Возникла ошибка, попробуйте еще раз')
-            menu_second()
-        else:
-            print('Данные успешно добавлены в базу')
-    elif user_input == '2':
-        pass
-    else:
-        print('Введен неверный номер')
-        menu_second()
-
-
-def menu_third():  # вывод меню №3 с дальнейшей логикой
-    print('\nХотите сделать открытку с прогнозом')
-    print('\n1. Да \n2. Нет')
-
-    user_input = input('\nВведите номер пункта меню: ')
-
-    if user_input == '1':
-        print('\nВыберите дату для открытки')
-        for i, day in enumerate(weather.temp_list):
-            print(f'{i + 1}. {day["дата"]}')
-        user_input2 = int(input('\nВыберите номер дня: '))
-        image_maker = ImageMaker(weather.temp_list[user_input2 - 1])
-        image_maker.create_picture()
-
-    elif user_input == '2':
-        pass
-    else:
-        print('Введен неверный номер')
-        menu_third()
-
-
-def menu_fours():
-    print('\nХотите получить резльтаты находящиеся в базе?')
-    print('\n1. Да \n2. Нет')
-
-    user_input = input('\nВведите номер пункта меню: ')
-
-    if user_input == '1':
-        try:
-            base.get_days()
-        except Exception:
-            print('Возникла ошибка, возможно в базе еще нет данных попробуйте еще раз')
-            menu_fours()
-        else:
-            print('')
-    elif user_input == '2':
-        pass
-    else:
-        print('Введен неверный номер')
-        menu_fours()
+                f'Дата: {day.date},'
+                f' Погода: {day.desc},'
+                f' Температура днем {day.t_day},'
+                f' Температура ночью {day.t_night}'
+            )
 
 
 weather = WeatherMaker(CITY)
 weather.pars()
-base = DatabaseUpdater()
+base = DatabaseUpdater(URL, dbp)
+image_maker = ImageMaker()
+menu = Wm(weather.weather_list, weather.today_date_pars, base, weather, image_maker)
 print('Погода прошлой недели: ')
-weather.print_14_day('last_d', 7)
-# TODO Тут стоит какой-то цикл создать, а нужные менюшки вызывать по выбору пользователя
-menu_first()
-menu_second()
-menu_third()
-menu_fours()
+menu.print_14_day('last_d', 7)
+
+while True:
+    print('\n1. Получить прогнозы за другой диапазон дат'
+          '\n2. Записать полученные прогнозы в базу данных'
+          '\n3. Создать открытку-прогноз по выбранной дате'
+          '\n4. Выгрузить из базы данных все прогнозы'
+          '\nЧтобы остановить выйти из программы введите "q"'
+          )
+    user_input = input('\nВведите пункт меню: ')
+    if user_input == '1':
+        menu.first()
+    elif user_input == '2':
+        menu.second()
+    elif user_input == '3':
+        menu.third()
+    elif user_input == '4':
+        menu.fours()
+    elif user_input == 'q':
+        break
+    else:
+        print('Введен неверный пункт меню')
