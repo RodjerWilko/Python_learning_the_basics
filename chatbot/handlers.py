@@ -9,7 +9,7 @@ re_phone = re.compile(r'\b\+?[7,8](\s*\d{3}\s*\d{3}\s*\d{2}\s*\d{2})\b')
 re_date = re.compile(r'\d{2}-\d{2}-\d{4}')
 
 
-def handle_name(text, context):
+def handle_name(text, context, flight_schedule):
     match = re.match(re_name, text)
     if match:
         context['name'] = text
@@ -18,23 +18,23 @@ def handle_name(text, context):
         return False
 
 
-def handle_city_out(text, context):
-    if text in settings.FLIGHT_SCHEDULE:
+def handle_city_out(text, context, flight_schedule):
+    if text in flight_schedule:
         context['city_out'] = text
         return True
     else:
         return False
 
 
-def handle_city_in(text, context):
-    if text in settings.FLIGHT_SCHEDULE[context['city_out']]:
+def handle_city_in(text, context, flight_schedule):
+    if text in flight_schedule[context['city_out']]:
         context['city_in'] = text
         return True
     else:
         return False
 
 
-def handle_phone_number(text, context):
+def handle_phone_number(text, context, flight_schedule):
     match = re.findall(re_phone, text)
     if match:
         context['phone'] = text
@@ -43,7 +43,7 @@ def handle_phone_number(text, context):
         return False
 
 
-def handle_email(text, context):
+def handle_email(text, context, flight_schedule):
     match = re.findall(re_email, text)
     if match:
         context['email'] = text
@@ -52,7 +52,7 @@ def handle_email(text, context):
         return False
 
 
-def handle_date(text, context):
+def handle_date(text, context, flight_schedule):
     match = re.match(re_date, text)
     if match:
         context['date'] = text
@@ -61,7 +61,7 @@ def handle_date(text, context):
         return False
 
 
-def handle_flights(text, context):
+def handle_flights(text, context, flight_schedule):
     for flight in context['num_of_flights']:
         if flight[0] == text:
             context['num_flight'] = text
@@ -71,7 +71,7 @@ def handle_flights(text, context):
     return False
 
 
-def handle_sits(text, context):
+def handle_sits(text, context, flight_schedule):
     if 0 < int(text) < 6:
         context['sits'] = text
         return True
@@ -79,12 +79,12 @@ def handle_sits(text, context):
         return False
 
 
-def handle_comment(text, context):
+def handle_comment(text, context, flight_schedule):
     context['comment'] = text
     return True
 
 
-def handle_correct_data(text, context):
+def handle_correct_data(text, context, flight_schedule):
     if text == 'да':
         return True
     elif text == 'нет':

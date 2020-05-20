@@ -161,30 +161,7 @@ class Test1(TestCase):
                 bot.fail_city_out_action(user_id)
 
         send_mock.assert_called_once_with(
-            message='\nМосква\nСанкт-петербург\nНью-йорк\nПариж',
-            random_id=ANY,
-            peer_id=user_id
-        )
-
-    def test_dispatcher(self):
-        user_id = self.RAW_EVENT['object']['message']['peer_id']
-        state = Mock()
-        state.context = self.CONTEXT
-        send_mock = Mock()
-        with patch('bot.vk_api.VkApi'):
-            with patch('bot.VkBotLongPoll'):
-                bot = Bot('', '')
-                bot.api = Mock()
-                bot.api.messages.send = send_mock
-                bot.dispatcher(user_id, state)
-
-        send_mock.assert_called_once_with(
-            message='\n№ рейса: 1\nдата отправления: 10-05-2020 \nвремя отправления: 14:00'
-                    '\n\n№ рейса: 2\nдата отправления: 11-05-2020 \nвремя отправления: 14:00'
-                    '\n\n№ рейса: 3\nдата отправления: 12-05-2020 \nвремя отправления: 14:00'
-                    '\n\n№ рейса: 4\nдата отправления: 13-05-2020 \nвремя отправления: 14:00'
-                    '\n\n№ рейса: 5\nдата отправления: 14-05-2020 \nвремя отправления: 14:00'
-                    '\n\nВыберите номер рейса из списка: ',
+            message='\nМосква\nПариж\nСанкт-петербург\nНью-йорк',
             random_id=ANY,
             peer_id=user_id
         )

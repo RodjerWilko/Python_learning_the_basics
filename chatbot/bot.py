@@ -5,6 +5,7 @@ import requests
 import vk_api.utils
 import logging
 import handlers
+from generate_flights import generate_flights
 from models import UserState, Registration
 from generate_ticket import generate_ticket
 
@@ -45,6 +46,7 @@ class Bot:
         self.vk = vk_api.VkApi(token=_token)
         self.long_poll = VkBotLongPoll(self.vk, _group_id)
         self.api = self.vk.get_api()
+        self.FLIGHT_SCHEDULE = generate_flights()
 
     def run(self):
         """Запуск бота"""
@@ -134,19 +136,19 @@ class Bot:
 
     def fail_city_out_action(self, user_id):  # вывод на экран возможных городов отправления
         text = ''
-        for city in settings.FLIGHT_SCHEDULE:
+        for city in self.FLIGHT_SCHEDULE:
             text += '\n' + city.capitalize()
         self.send_text(text, user_id)
 
     def fail_city_in_action(self, user_id, state):  # вывод на экран возможных городов прибытия
         text = ''
-        for city in settings.FLIGHT_SCHEDULE[state.context['city_out']]:
+        for city in self.FLIGHT_SCHEDULE[state.context['city_out']]:
             text += '\n' + city.capitalize()
         self.send_text(text, user_id)
 
     def check_flights_action(self, user_id, state):  # проверка есть ли между городами рейсы, если нет то выдает текст
         print(state.context)
-        if not settings.FLIGHT_SCHEDULE[state.context['city_out']][state.context['city_in']]:
+        if not self.FLIGHT_SCHEDULE[state.context['city_out']][state.context['city_in']]:
             text = 'Между данными городами нет рейсов, попробуйте заново'
             self.send_text(text, user_id)
             print(type(state.context['email']))
@@ -171,7 +173,7 @@ class Bot:
         user_date = state.context['date']
         list_flights = ''
         state.context['num_of_flights'] = []
-        for num, date, time in settings.FLIGHT_SCHEDULE[state.context['city_out']][state.context['city_in']]:
+        for num, date, time in self.FLIGHT_SCHEDULE[state.context['city_out']][state.context['city_in']]:
             if date >= user_date and count != 5:
                 list_flights += f'\n№ рейса: {num}\nдата отправления: {date} \nвремя отправления: {time}\n'
                 state.context['num_of_flights'].append([num, date, time])
@@ -193,7 +195,7 @@ class Bot:
         steps = settings.SCENARIO[state.scenario_name]['steps']
         step = steps[state.step_name]
         handler = getattr(handlers, step['handler'])
-        if handler(text=text, context=state.context):  # если хэндлер выернул True
+        if handler(text=text, context=state.context, flight_schedule=self.FLIGHT_SCHEDULE):  # если хэндлер выернул True
             next_step = steps[step['next_step']]
             text_to_send = next_step['text'].format(**state.context)
             if next_step['next_step']:
@@ -217,7 +219,7 @@ class Bot:
                 state.delete()
             if 'action' in step:  # если в описании шага есть 'action'
                 if step['action'] == 'check_flights_action':
-                    if not settings.FLIGHT_SCHEDULE[state.context['city_out']][state.context['city_in']]:
+                    if not self.FLIGHT_SCHEDULE[state.context['city_out']][state.context['city_in']]:
                         self.check_flights_action(user_id, state)
                         text_to_send = 'Введите город отправения: '
                 elif step['action'] == 'send_image':
