@@ -4,12 +4,12 @@ import vk_api.utils
 import settings
 
 re_name = re.compile(r'^[\w\-\s]{3,40}$')
-re_email = re.compile(r'(^|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|$)')
+re_email = re.compile(r'(|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|)')
 re_phone = re.compile(r'\b\+?[7,8](\s*\d{3}\s*\d{3}\s*\d{2}\s*\d{2})\b')
 re_date = re.compile(r'\d{2}-\d{2}-\d{4}')
 
 
-def name(text, context):
+def handle_name(text, context):
     match = re.match(re_name, text)
     if match:
         context['name'] = text
@@ -43,10 +43,10 @@ def handle_phone_number(text, context):
         return False
 
 
-def email(text, context):
+def handle_email(text, context):
     match = re.findall(re_email, text)
-    if len(match) > 0:
-        context['email'] = match[0]
+    if match:
+        context['email'] = text
         return True
     else:
         return False

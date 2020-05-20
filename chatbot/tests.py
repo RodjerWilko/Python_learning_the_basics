@@ -1,10 +1,20 @@
 from copy import deepcopy
 from unittest import TestCase
 from unittest.mock import patch, Mock, ANY
-
+from pony.orm import db_session, rollback
 from vk_api.bot_longpoll import VkBotMessageEvent
 
 from bot import Bot
+from generate_ticket import generate_ticket
+
+
+def isolate_db(test_func):
+    def wrapper(*args, **kwargs):
+        with db_session:
+            test_func(*args, **kwargs)
+            rollback()
+
+    return wrapper
 
 
 class Test1(TestCase):
@@ -15,7 +25,7 @@ class Test1(TestCase):
                          'from_id': 594253363,
                          'id': 70,
                          'out': 0,
-                         'peer_id': 594253363,
+                         'peer_id': 594253362,
                          'text': 'ac',
                          'conversation_message_id': 70,
                          'fwd_messages': [],
@@ -47,6 +57,7 @@ class Test1(TestCase):
         'phone': '89176561453'
     }
 
+    @isolate_db
     def test_run(self):
         count = 5
         obj = {'a': 1}
@@ -94,7 +105,7 @@ class Test1(TestCase):
                 bot.on_event(event)
 
         send_mock.assert_called_once_with(
-            message=f"Вы запустили помощника для заказа билета на самолет \nВведите город отправения: ",
+            message=f"\nВы запустили помощника для заказа билета на самолет \nВведите Ваше имя: ",
             random_id=ANY,
             peer_id=self.RAW_EVENT['object']['message']['peer_id']
         )
@@ -178,6 +189,16 @@ class Test1(TestCase):
             peer_id=user_id
         )
 
+    def test_image_generation(self):
+        with open('files/123.png', 'rb') as avatar_photo:
+            avatar_mock = Mock()
+            avatar_mock.content = avatar_photo.read()
 
+        with patch('requests.get', return_value=avatar_mock):
+            ticket_file = generate_ticket(name='максим', city_out='москва', city_in='париж', date_flight='21-05-2020',
+                                          email='123@123.ru')
 
+        with open('files/temp.png', 'rb') as expected_file:
+            expected_bytes = expected_file.read()
 
+        assert ticket_file.read() == expected_bytes

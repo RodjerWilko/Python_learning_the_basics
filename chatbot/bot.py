@@ -1,8 +1,12 @@
+from pony.orm import db_session
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 
+import requests
 import vk_api.utils
 import logging
 import handlers
+from models import UserState, Registration
+from generate_ticket import generate_ticket
 
 try:
     import settings
@@ -24,13 +28,6 @@ def configure_logging():
     file_handler.setLevel(logging.DEBUG)
 
 
-class UserState:
-    def __init__(self, scenario_name, step_name, context=None):
-        self.scenario_name = scenario_name
-        self.step_name = step_name
-        self.context = context or {}
-
-
 class Bot:
     """
     Echo bot для Vk.com
@@ -48,7 +45,6 @@ class Bot:
         self.vk = vk_api.VkApi(token=_token)
         self.long_poll = VkBotLongPoll(self.vk, _group_id)
         self.api = self.vk.get_api()
-        self.user_states = dict()
 
     def run(self):
         """Запуск бота"""
@@ -58,6 +54,7 @@ class Bot:
             except Exception:
                 log.exception('Ошибка в обработке события')
 
+    @db_session
     def on_event(self, event):
         """
         :param event: VkBotMessageEvent object
@@ -68,26 +65,26 @@ class Bot:
             return
         user_id = event.object['message']['peer_id']
         text = event.obj['message']['text'].lower()
+        state = UserState.get(user_id=str(user_id))
 
         if text == '/ticket':
-            text_to_send = self.start_scenario(scenario_name='ticket', user_id=user_id)
-        elif text == '/help':
-            text_to_send = settings.INTENTS[0]['answer']
-        elif text == 'нет' and self.user_states[user_id].step_name == 'step7':
-            text_to_send = self.start_scenario(scenario_name='ticket', user_id=user_id)
-        else:
-            if user_id in self.user_states:
-                text_to_send = self.continue_scenario(user_id, text)
+            if state:
+                state.delete()
+                self.send_text(self.start_scenario(scenario_name='ticket', user_id=user_id), user_id)
             else:
-                text_to_send = settings.DEFAULT_ANSWER
-        self.api.messages.send(
-            message=text_to_send,
-            random_id=vk_api.utils.get_random_id(),
-            peer_id=user_id
-        )
+                self.send_text(self.start_scenario(scenario_name='ticket', user_id=user_id), user_id)
+        elif text == '/help':
+            self.send_text(settings.INTENTS[0]['answer'], user_id)
+        elif text == 'нет' and state.step_name == 'step9':
+            state.delete()
+            self.send_text(self.start_scenario(scenario_name='ticket', user_id=user_id), user_id)
+        else:
+            if state is not None:
+                self.send_text(self.continue_scenario(user_id, text, state), user_id)
+            else:
+                self.send_text(settings.DEFAULT_ANSWER, user_id)
 
-        if user_id in self.user_states:
-            state = self.user_states[user_id]
+        if state is not None:
             steps = settings.SCENARIO[state.scenario_name]['steps']
             step = steps[state.step_name]
             if 'action' in step:
@@ -95,6 +92,35 @@ class Bot:
                     self.dispatcher(user_id, state)
                 elif step['action'] == 'correct_check':
                     self.correct_check(user_id, state)
+
+    def send_text(self, text_to_send, user_id):
+        self.api.messages.send(
+            message=text_to_send,
+            random_id=vk_api.utils.get_random_id(),
+            peer_id=user_id
+        )
+
+    def send_image(self, state, user_id):
+        image = generate_ticket(
+            name=state.context['name'],
+            city_out=state.context['city_out'],
+            city_in=state.context['city_in'],
+            date_flight=state.context['date_flight'],
+            email=state.context['email']
+        )
+        upload_url = self.api.photos.getMessagesUploadServer()['upload_url']
+        upload_data = requests.post(url=upload_url, files={'photo': ('image.png', image, 'image/png')}).json()
+        image_data = self.api.photos.saveMessagesPhoto(**upload_data)
+
+        owner_id = image_data[0]['owner_id']
+        media_id = image_data[0]['id']
+        attachment = f'photo{owner_id}_{media_id}'
+
+        self.api.messages.send(
+            attachment=attachment,
+            random_id=vk_api.utils.get_random_id(),
+            peer_id=user_id
+        )
 
     def correct_check(self, user_id, state):  # формирует и выводит на экран введеные данные для проверки
         text = f'\nгород отправления: \n{state.context["city_out"].capitalize()}\n ' \
@@ -104,42 +130,39 @@ class Bot:
                f'\nвремя отправления: \n{state.context["time_flight"]}\n' \
                f'\nколичество мест: \n{state.context["sits"]}\n' \
                f'\nваш комментарий:\n{state.context["comment"]}\n'
-        self.api.messages.send(
-            message=text,
-            random_id=vk_api.utils.get_random_id(),
-            peer_id=user_id
-        )
+        self.send_text(text, user_id)
 
     def fail_city_out_action(self, user_id):  # вывод на экран возможных городов отправления
         text = ''
         for city in settings.FLIGHT_SCHEDULE:
             text += '\n' + city.capitalize()
-        self.api.messages.send(
-            message=text,
-            random_id=vk_api.utils.get_random_id(),
-            peer_id=user_id
-        )
+        self.send_text(text, user_id)
 
     def fail_city_in_action(self, user_id, state):  # вывод на экран возможных городов прибытия
         text = ''
         for city in settings.FLIGHT_SCHEDULE[state.context['city_out']]:
             text += '\n' + city.capitalize()
-        self.api.messages.send(
-            message=text,
-            random_id=vk_api.utils.get_random_id(),
-            peer_id=user_id
-        )
+        self.send_text(text, user_id)
 
     def check_flights_action(self, user_id, state):  # проверка есть ли между городами рейсы, если нет то выдает текст
         print(state.context)
         if not settings.FLIGHT_SCHEDULE[state.context['city_out']][state.context['city_in']]:
             text = 'Между данными городами нет рейсов, попробуйте заново'
-            self.api.messages.send(
-                message=text,
-                random_id=vk_api.utils.get_random_id(),
-                peer_id=user_id
+            self.send_text(text, user_id)
+            print(type(state.context['email']))
+            Registration(
+                name=state.context['name'],
+                email=state.context['email'],
+                date_flight=state.context['date_flight'],
+                time_flight=state.context['time_flight'],
+                city_out=state.context['city_out'],
+                city_in=state.context['city_in'],
+                sits=state.context['sits'],
+                comment=state.context['comment'],
+                phone=state.context['phone']
             )
-            self.user_states.pop(user_id)
+
+            state.delete()
             self.start_scenario(scenario_name='ticket', user_id=user_id)
 
     def dispatcher(self, user_id, state):
@@ -154,11 +177,7 @@ class Bot:
                 state.context['num_of_flights'].append([num, date, time])
                 count += 1
         list_flights += '\nВыберите номер рейса из списка: '
-        self.api.messages.send(
-            message=list_flights,
-            random_id=vk_api.utils.get_random_id(),
-            peer_id=user_id
-        )
+        self.send_text(list_flights, user_id)
 
     def start_scenario(self, scenario_name, user_id):
         """начинает сценарий """
@@ -166,12 +185,11 @@ class Bot:
         first_step = scenario['first_step']
         step = scenario['steps'][first_step]
         text_to_send = step['text']
-        self.user_states[user_id] = UserState(scenario_name=scenario_name, step_name=first_step)
+        UserState(scenario_name=scenario_name, step_name=first_step, context={}, user_id=str(user_id))
         return text_to_send
 
-    def continue_scenario(self, user_id, text):
+    def continue_scenario(self, user_id, text, state):
         """продолжает сценарий"""
-        state = self.user_states[user_id]
         steps = settings.SCENARIO[state.scenario_name]['steps']
         step = steps[state.step_name]
         handler = getattr(handlers, step['handler'])
@@ -181,13 +199,29 @@ class Bot:
             if next_step['next_step']:
                 state.step_name = step['next_step']
             else:
-                print(state.context)
-                self.user_states.pop(user_id)
+                print(state)
+                print(state.context['email'])
+                print(type(state.context['email']))
+                Registration(
+                    name=state.context['name'],
+                    email=state.context['email'],
+                    date_flight=state.context['date_flight'],
+                    time_flight=state.context['time_flight'],
+                    city_out=state.context['city_out'],
+                    city_in=state.context['city_in'],
+                    sits=state.context['sits'],
+                    comment=state.context['comment'],
+                    phone=state.context['phone']
+                )
+
+                state.delete()
             if 'action' in step:  # если в описании шага есть 'action'
                 if step['action'] == 'check_flights_action':
                     if not settings.FLIGHT_SCHEDULE[state.context['city_out']][state.context['city_in']]:
                         self.check_flights_action(user_id, state)
                         text_to_send = 'Введите город отправения: '
+                elif step['action'] == 'send_image':
+                    self.send_image(state, user_id)
 
         else:  # если хэндлер вернул False
             text_to_send = step['failure_text'].format(**state.context)
